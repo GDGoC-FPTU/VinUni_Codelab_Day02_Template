@@ -61,13 +61,13 @@ Hãy sử dụng **4 Lenses** dưới đây để quét qua hoạt động vận
 > *"Tôi là AI Engineer tại Vin Smart Future (Vingroup). Tôi đang tìm kiếm các pain point vận hành cụ thể có thể tối ưu bằng AI cho mảng [Chọn một: VinFast / Xanh SM / Vinhomes / Vinmec]. Hãy gợi ý cho tôi 5 quy trình nghiệp vụ thủ công, tốn nhiều thời gian và gây rò rỉ hiệu suất kèm con số thống kê ước tính về tổn thất."*
 
 ### 📝 List bài toán của tôi:
-| # | Subsidiary (VinFast/Xanh SM...) | Lens | Mô tả ngắn bài toán |
-|---|----------------------------------|------|---------------------|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
+| # | Subsidiary | Lens | Mô tả ngắn bài toán |
+|---|------------|------|---------------------|
+| 1 | VinFast | Tốn thời gian | Kỹ sư mất nhiều thời gian gom và đối chiếu dữ liệu từ MES/PLC để phân tích nguyên nhân gốc rễ (RCA) mỗi khi lỗi tăng. |
+| 2 | Xanh SM | Lặp lại | Nhân viên CSKH đọc và phân loại thủ công hàng ngàn ticket khiếu nại hằng ngày để gán cho đúng phòng ban. |
+| 3 | VinFast | Pain từ người khác | Kỹ thuật viên bảo trì tra cứu thủ công tài liệu SOP dài hàng ngàn trang mỗi khi máy móc báo lỗi, làm tăng downtime. |
+| 4 | Xanh SM | AI có thể tốt hơn | Tài xế sạc theo cảm tính khiến trạm trung tâm xếp hàng dài, trạm vùng ven bỏ trống, lãng phí thời gian kinh doanh. |
+| 5 | VinFast | Lặp lại | QC phải quan sát thủ công bề mặt xe để tìm lỗi ngoại quan lặp đi lặp lại hàng ngàn xe, dễ sai sót do mệt mỏi. |
 
 ---
 
@@ -75,26 +75,79 @@ Hãy sử dụng **4 Lenses** dưới đây để quét qua hoạt động vận
 
 Chọn **top 3 bài toán** từ danh sách trên và hoàn thiện **3 Quick Problem Cards** dưới đây (10 phút/card).
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
-│ QUICK PROBLEM CARD #___                                     │
+│ QUICK PROBLEM CARD #1                                       │
 │                                                             │
-│ Bài toán (1 câu): ________________________________________  │
-│ Công ty thành viên: [ ] VinFast  [ ] Xanh SM  [ ] Vinhomes  │
+│ Bài toán: Kỹ thuật viên bảo trì tra cứu thủ công tài liệu   │
+│ SOP và lịch sử sửa chữa mỗi khi máy móc báo lỗi, tăng downtime│
+│ Công ty thành viên: [x] VinFast  [ ] Xanh SM  [ ] Vinhomes  │
 │                     [ ] Vinmec   [ ] Khác (Ghi rõ)________  │
 │                                                             │
-│ Ai đang đau (Actor)? ______________________________________ │
+│ Ai đang đau (Actor)? Kỹ thuật viên (Technician) tại xưởng   │
 │                                                             │
-│ Workflow thủ công hiện tại (3-5 bước):                      │
-│   1. ___ ──> 2. ___ ──> 3. ___ ──> 4. ___                   │
+│ Workflow thủ công hiện tại (4 bước):                        │
+│   1. Máy báo mã lỗi ──> 2. Kỹ thuật viên tìm/đọc tài liệu   │
+│   SOP thủ công ──> 3. Kiểm tra lịch sử ──> 4. Sửa chữa      │
 │                                                             │
-│ Bước nào tốn thời gian/lỗi nhất? ___ (⏱ ___ phút/lượt)      │
-│ AI có thể nhảy vào hỗ trợ ở bước nào? _____________________ │
+│ Bước nào tốn thời gian/lỗi nhất? Bước 2 & 3 (⏱ 15+ phút)    │
+│ AI có thể nhảy vào hỗ trợ ở bước nào? Bước 2 & 3 (GenAI đọc │
+│ mã lỗi, trích xuất nguyên nhân & cách xử lý từ SOP)         │
 │                                                             │
-│ Đo thành công bằng gì (Metric có số)? ______________________ │
-│   VD: "Giảm thời gian soạn phản hồi từ 10 min ──> under 2 min"│
+│ Đo thành công bằng gì (Metric có số)?                       │
+│ Giảm thời gian tra cứu từ 15 phút ──> dưới 2 phút (giảm 20% │
+│ thời gian sửa chữa - MTTR).                                 │
 │                                                             │
-│ Quick Architecture: [ ] No AI  [ ] Rule  [ ] LLM  [ ] Agent │
+│ Quick Architecture: [ ] No AI  [ ] Rule  [x] LLM  [ ] Agent │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│ QUICK PROBLEM CARD #2                                       │
+│                                                             │
+│ Bài toán: Kỹ sư mất nhiều công sức kéo và đối chiếu dữ liệu │
+│ từ nhiều hệ thống để tìm nguyên nhân gốc rễ (RCA) của lỗi.  │
+│ Công ty thành viên: [x] VinFast  [ ] Xanh SM  [ ] Vinhomes  │
+│                     [ ] Vinmec   [ ] Khác (Ghi rõ)________  │
+│                                                             │
+│ Ai đang đau (Actor)? Kỹ sư Chất lượng / Kỹ sư Sản xuất      │
+│                                                             │
+│ Workflow thủ công hiện tại (5 bước):                        │
+│   1. Phát hiện lỗi ──> 2. Kéo data từ MES/PLC/QMS ──> 3. Vẽ │
+│   biểu đồ/so sánh chéo ──> 4. Đặt giả thuyết ──> 5. Test    │
+│                                                             │
+│ Bước nào tốn thời gian/lỗi nhất? Bước 2 & 3 (⏱ Vài giờ-ngày)│
+│ AI có thể nhảy vào hỗ trợ ở bước nào? Bước 2 & 3 & 4 (Agent │
+│ tự động gom dữ liệu, tìm correlation & rank các root causes)│
+│                                                             │
+│ Đo thành công bằng gì (Metric có số)?                       │
+│ Giảm 90% thời gian tìm RCA, tiết kiệm 3-10 tỷ VNĐ/năm/line. │
+│                                                             │
+│ Quick Architecture: [ ] No AI  [ ] Rule  [ ] LLM  [x] Agent │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│ QUICK PROBLEM CARD #3                                       │
+│                                                             │
+│ Bài toán: Nhân viên CSKH phân loại thủ công hàng ngàn phản  │
+│ hồi/ticket khiếu nại của khách hàng mỗi ngày.               │
+│ Công ty thành viên: [ ] VinFast  [x] Xanh SM  [ ] Vinhomes  │
+│                     [ ] Vinmec   [ ] Khác (Ghi rõ)________  │
+│                                                             │
+│ Ai đang đau (Actor)? Nhân viên CSKH (Customer Service)      │
+│                                                             │
+│ Workflow thủ công hiện tại (4 bước):                        │
+│   1. Nhận ticket ──> 2. Đọc & hiểu nội dung ──> 3. Xác định │
+│   loại lỗi & mức độ ──> 4. Gắn thẻ và chuyển bộ phận xử lý  │
+│                                                             │
+│ Bước nào tốn thời gian/lỗi nhất? Bước 2 & 3 (⏱ 2-3 phút/vé) │
+│ AI có thể nhảy vào hỗ trợ ở bước nào? Bước 2 & 3 (LLM đọc   │
+│ nội dung, tự gán nhãn loại lỗi và định tuyến ticket)        │
+│                                                             │
+│ Đo thành công bằng gì (Metric có số)?                       │
+│ 100% ticket được phân loại trong < 5 giây. Giảm TAT, giảm   │
+│ 10% tỷ lệ rời bỏ khách hàng (churn rate).                   │
+│                                                             │
+│ Quick Architecture: [ ] No AI  [ ] Rule  [x] LLM  [ ] Agent │
 └─────────────────────────────────────────────────────────────┘
 ```
 
