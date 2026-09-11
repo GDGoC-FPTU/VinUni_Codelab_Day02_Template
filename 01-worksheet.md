@@ -63,11 +63,11 @@ Hãy sử dụng **4 Lenses** dưới đây để quét qua hoạt động vận
 ### 📝 List bài toán của tôi:
 | # | Subsidiary (VinFast/Xanh SM...) | Lens | Mô tả ngắn bài toán |
 |---|----------------------------------|------|---------------------|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
+| 1 | VinUni Canteen | Tốn thời gian | Sinh viên phải xếp hàng mua vé rồi xếp hàng lần hai tại quầy cơm vào giờ trưa. |
+| 2 | VinUni Canteen | Lặp lại | Thu ngân phát vé và nhân viên quầy cơm kiểm tra/thu vé cho từng suất ăn. |
+| 3 | VinUni Canteen | AI có thể tốt hơn | Menu chưa dùng món đã lưu và lịch sử mua để gợi ý món hoặc đặt lại món quen. |
+| 4 | Vinhomes | AI có thể tốt hơn | Thiết bị tòa nhà có nguy cơ vận hành theo lịch cố định thay vì theo nhu cầu thực tế. |
+| 5 | Vinhomes | Stakeholder Pain | Bảo vệ theo dõi nhiều camera nên có nguy cơ phát hiện chậm sự kiện bất thường. |
 
 ---
 
@@ -97,6 +97,45 @@ Chọn **top 3 bài toán** từ danh sách trên và hoàn thiện **3 Quick Pr
 │ Quick Architecture: [ ] No AI  [ ] Rule  [ ] LLM  [ ] Agent │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+### Quick Problem Card #1 — Pre-order căn-tin VinUni
+
+| Trường | Nội dung |
+|---|---|
+| **Bài toán** | Sinh viên mua vé rồi xếp hàng lần hai để nhận cơm; chưa có đặt trước, món đã lưu hoặc gợi ý món phù hợp. |
+| **Actor** | Sinh viên, thu ngân, nhân viên quầy cơm, quản lý căn-tin. |
+| **Workflow** | Xem món → xếp hàng mua vé → thanh toán/nhận vé → xếp hàng quầy cơm → đưa vé/chọn món → nhận suất. |
+| **Bottleneck** | Hai hàng chờ, giả định 10–20 phút giờ cao điểm; cần đo baseline trong 5 ngày học. |
+| **AI hỗ trợ** | Gợi ý tối đa 3 món từ menu còn hàng, món đã lưu và lịch sử mua; hiểu yêu cầu tự nhiên để tạo đơn nháp. |
+| **Metric** | Nhận đơn pre-order dưới 5 phút; ≥70% đơn giờ cao điểm qua app/QR; đơn sai dưới 2%. |
+| **Architecture** | Rule/State-machine cho giá, tồn kho, thanh toán/QR; LLM Feature cho gợi ý và draft. |
+| **Boundary** | AI không tự đặt/trừ tiền/đổi giá/hoàn tiền; sinh viên luôn xác nhận. |
+
+### Quick Problem Card #2 — Camera an ninh Vinhomes
+
+| Trường | Nội dung |
+|---|---|
+| **Bài toán** | Bảo vệ quan sát nhiều camera nên có nguy cơ bỏ sót hoặc phát hiện chậm sự kiện an ninh đã định nghĩa. |
+| **Actor** | Nhân viên giám sát, đội tuần tra, cư dân và ban quản lý. |
+| **Workflow** | Camera truyền hình → bảo vệ quan sát → phát hiện nghi ngờ → đối chiếu → gọi tuần tra xác minh. |
+| **Bottleneck** | Quan sát liên tục nhiều luồng; giả định 5–15 phút để phát hiện/xác minh. |
+| **AI hỗ trợ** | AI Vision cảnh báo xe đỗ sai, vật thể bỏ quên hoặc mật độ người vượt ngưỡng. |
+| **Metric** | Recall ≥85%; cảnh báo dưới 60 giây; false-positive dưới 15%. |
+| **Architecture** | AI Vision + Rule-based. |
+| **Boundary** | AI chỉ cảnh báo; bảo vệ xác minh, không tự phạt hay tự khóa/mở cổng. |
+
+### Quick Problem Card #3 — Bảo trì dự báo Vinhomes
+
+| Trường | Nội dung |
+|---|---|
+| **Bài toán** | Lỗi thiết bị có thể chỉ được phát hiện khi thang máy, điều hòa, bơm hoặc máy phát đã bất thường/dừng hẳn. |
+| **Actor** | Kỹ thuật viên, quản lý tòa nhà và cư dân. |
+| **Workflow** | Thiết bị vận hành → báo lỗi → tạo ticket → kỹ thuật viên kiểm tra → tra lịch sử → sửa/đặt phụ tùng. |
+| **Bottleneck** | Phát hiện muộn và chẩn đoán thủ công; giả định 30–120 phút để khoanh vùng một sự cố. |
+| **AI hỗ trợ** | Predictive ML chấm điểm rủi ro từ rung, nhiệt độ, điện năng, chu kỳ và lịch sử lỗi. |
+| **Metric** | Phát hiện trước ≥70% lỗi mục tiêu; giảm 20% downtime; giảm 15% ca sửa khẩn. |
+| **Architecture** | Predictive ML + Rule-based cảnh báo. |
+| **Boundary** | AI chỉ đề xuất kiểm tra; kỹ thuật viên duyệt trước khi dừng thiết bị/thay linh kiện. |
 
 > [!TIP]
 > **🤖 AI Prompts — Stress-Test thẻ bài toán:**
