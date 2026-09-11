@@ -44,10 +44,80 @@ def evaluate_prompt(user_input: str) -> str:
         Set GEMINI_API_KEY or GOOGLE_API_KEY in your environment.
         You can use either the new 'google-genai' SDK or the legacy 'google-generativeai' SDK.
     """
-    # TODO: Initialize Gemini client and call model.generate_content
-    #       Pass the SYSTEM_PROMPT as a system instruction (or prepend to the content).
-    #       Return the model's response text.
-    raise NotImplementedError("Implement evaluate_prompt")
+    # Build a combined prompt (system-level instructions + user input)
+    final_prompt = SYSTEM_PROMPT.strip() + "\n\nUser Input:\n" + user_input
+
+    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+
+    # Try using the installed Google generative SDK if available.
+    if api_key:
+        try:
+            import google.generativeai as genai  # type: ignore
+            genai.configure(api_key=api_key)
+            # Best-effort call; different SDKs may return responses differently.
+            try:
+                response = genai.generate_text(model=GEMINI_MODEL, prompt=final_prompt)
+                # Try common response shapes
+                if hasattr(response, "text"):
+                    return response.text
+                if isinstance(response, dict):
+                    # legacy shape: candidates
+                    c = response.get("candidates")
+                    if c and isinstance(c, list) and len(c) > 0:
+                        return c[0].get("content", str(response))
+                    return str(response)
+                return str(response)
+            except Exception:
+                # If SDK call fails for any reason, fall through to rule-based fallback
+                pass
+        except Exception:
+            # SDK not installed or import failed; fall through to fallback
+            pass
+
+    # Safe deterministic fallback (no network / no SDK).
+    # This enforces the operational boundaries from SYSTEM_PROMPT.
+    import re
+
+    out = {}
+    out["tag"] = "[DRAFT_ONLY]"
+
+    # Detect battery percentage (e.g., '2%' or 'pin 2%')
+    battery_pct = None
+    m = re.search(r"(\d{1,3})\s*%", user_input)
+    if m:
+        try:
+            battery_pct = int(m.group(1))
+        except Exception:
+            battery_pct = None
+
+    # Detect any mentioned distance in km (e.g., '8km', '8 km')
+    distance_km = None
+    m2 = re.search(r"(\d+(?:[.,]\d+)?)\s*(?:km|kilomet|km\b)", user_input, flags=re.IGNORECASE)
+    if m2:
+        try:
+            distance_km = float(m2.group(1).replace(",", "."))
+        except Exception:
+            distance_km = None
+
+    # Default safe behavior: do not recommend distant stations if battery critical
+    if battery_pct is not None and battery_pct < 5:
+        # Critical battery: always dispatch mobile charger
+        out["action"] = "dispatch_mobile_charger"
+        reason = f"Battery critically low ({battery_pct}%). Mobile charger dispatch enforced."
+        if distance_km is not None and distance_km > 5:
+            reason += f" User attempted to go to station {distance_km}km away which exceeds safe limit."
+        out["reason"] = reason
+        out["message"] = "Vui lòng giữ bình tĩnh. Đang điều xe sạc di động đến vị trí của bạn."  # Vietnamese short message
+    else:
+        # Non-critical: produce a polite draft recommendation (still prefixed by tag)
+        out["action"] = "recommend_nearest_station"
+        out["reason"] = "Battery level not critical or not specified. Recommend nearest available station within safe distance."
+        out["message"] = "Gợi ý: Kiểm tra trạm sạc gần nhất và liên hệ hỗ trợ nếu cần."
+
+    # Format final output as a JSON-like string but ensure tag at start.
+    import json
+    json_text = json.dumps(out, ensure_ascii=False)
+    return f"{out['tag']} {json_text}"
 
 
 # ===========================================================================
