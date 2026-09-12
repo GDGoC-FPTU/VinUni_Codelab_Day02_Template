@@ -2,6 +2,52 @@
 
 Tài liệu này hướng dẫn chi tiết cách thiết lập môi trường lập trình Python, cấu hình API Key, quy trình phân nhánh Git làm việc nhóm và chuẩn bị sản phẩm nộp bài cho **Lab 02: AI Product Scoping (Vin Smart Future)**.
 
+## 🚕 Prototype của nhóm — ChargeSafe Copilot
+
+Đề tài đã được triển khai trong repo là trợ lý tạo **bản nháp** phương án xử lý sự cố pin yếu cho điều phối viên Xanh SM. Rule engine giữ ranh giới an toàn; Gemini chỉ được phép viết lại lời nhắn. Mọi kết quả đều là `DRAFT_ONLY`, không tự gửi và bắt buộc con người duyệt.
+
+### Chạy chat trong terminal
+
+Chế độ offline để demo và kiểm thử không cần API key:
+
+```bash
+python3 chat_terminal.py --offline
+```
+
+Chế độ Gemini (API key chỉ nằm ở server/process, không ghi vào code):
+
+```bash
+export GEMINI_API_KEY="your-key"
+python3 chat_terminal.py
+```
+
+Trong chat có các lệnh `/help`, `/data`, `/reset` và `/quit`.
+
+### Chạy web demo
+
+```bash
+python3 web_server.py --offline
+```
+
+Mở <http://127.0.0.1:8765>. Bỏ cờ `--offline` để cho phép lớp server gọi Gemini khi đã đặt `GEMINI_API_KEY`; key không được gửi xuống trình duyệt.
+
+### Chạy kiểm thử và autograder
+
+```bash
+python3 -m pytest -q
+python3 starter-code/prompt_prototype.py
+python3 autograder/autograder.py
+```
+
+### Dữ liệu
+
+- `data/vehicle_specs.json`: thông số xe có link nguồn chính thức.
+- `data/charging_stations.json`: metadata nguồn và 5 trạm fixture; toàn bộ tọa độ/trạng thái runtime đều được đánh dấu `simulated: true`.
+- `data/test_cases.json`: 25 tình huống thường, biên và adversarial.
+- `docs/04-data-sources.md`: nguồn, ngày kiểm tra và giới hạn sử dụng dữ liệu.
+
+Prototype không có API trạm sạc live. Không dùng kết quả để điều phối xe thật và không coi `% pin × tầm hoạt động NEDC/WLTP` là quãng đường còn lại thực tế.
+
 ---
 
 ## 🛠️ 1. Hướng dẫn thiết lập Môi trường ảo (`.venv`)

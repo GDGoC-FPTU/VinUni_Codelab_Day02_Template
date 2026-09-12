@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1050" viewBox="0 0 1800 1050">
+  <defs>
+    <style>
+      .title{font:700 48px 'DejaVu Sans',sans-serif;fill:#082f49}.sub{font:400 22px 'DejaVu Sans',sans-serif;fill:#475569}.label{font:700 16px 'DejaVu Sans',sans-serif;letter-spacing:1.6px;fill:#0369a1}.step{font:700 25px 'DejaVu Sans',sans-serif;fill:#0f172a}.body{font:400 19px 'DejaVu Sans',sans-serif;fill:#334155}.time{font:700 18px 'DejaVu Sans',sans-serif;fill:#075985}.small{font:400 16px 'DejaVu Sans',sans-serif;fill:#64748b}.bottle{font:700 17px 'DejaVu Sans',sans-serif;fill:#b91c1c}.handoff{font:700 15px 'DejaVu Sans',sans-serif;fill:#7c3aed}.footer{font:400 16px 'DejaVu Sans',sans-serif;fill:#475569}.arrow{stroke:#0ea5e9;stroke-width:5;fill:none;stroke-linecap:round;stroke-linejoin:round}.dash{stroke:#8b5cf6;stroke-width:3;fill:none;stroke-dasharray:10 10}
+    </style>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0f172a" flood-opacity=".10"/></filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#0ea5e9"/></marker>
+  </defs>
+  <rect width="1800" height="1050" fill="#f8fafc"/>
+  <rect x="0" y="0" width="1800" height="16" fill="#0ea5e9"/>
+  <text x="90" y="100" class="label">CURRENT-STATE WORKFLOW · XANH SM</text>
+  <text x="90" y="165" class="title">Điều phối sự cố pin yếu / hết pin</text>
+  <text x="90" y="207" class="sub">Tổng thời gian giả định theo worked example: khoảng 15 phút mỗi lượt</text>
+
+  <path d="M390 400 H440" class="arrow" marker-end="url(#arrow)"/>
+  <path d="M730 400 H780" class="arrow" marker-end="url(#arrow)"/>
+  <path d="M1070 400 H1120" class="arrow" marker-end="url(#arrow)"/>
+  <path d="M1410 400 H1460" class="arrow" marker-end="url(#arrow)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="90" y="280" width="300" height="250" rx="24" fill="#fff" stroke="#bae6fd" stroke-width="3"/>
+    <circle cx="135" cy="325" r="23" fill="#0ea5e9"/><text x="128" y="333" style="font:700 20px sans-serif;fill:white">1</text>
+    <text x="175" y="333" class="step">Nhận báo cáo</text>
+    <text x="120" y="385" class="body">Tài xế gọi / nhắn</text><text x="120" y="415" class="body">mô tả sự cố pin</text>
+    <text x="120" y="467" class="time">⏱ 2 phút</text><text x="120" y="500" class="small">Đầu ra: log sự cố</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="440" y="280" width="290" height="250" rx="24" fill="#fff" stroke="#c4b5fd" stroke-width="3"/>
+    <circle cx="485" cy="325" r="23" fill="#8b5cf6"/><text x="478" y="333" style="font:700 20px sans-serif;fill:white">2</text>
+    <text x="525" y="333" class="step">Tra GPS</text>
+    <text x="470" y="385" class="body">Hỏi mẫu xe, % pin,</text><text x="470" y="415" class="body">biển số và vị trí</text>
+    <text x="470" y="467" class="time">⏱ 2 phút</text><text x="470" y="500" class="handoff">↻ Handoff: GPS dashboard</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="780" y="260" width="290" height="290" rx="24" fill="#fff7ed" stroke="#ef4444" stroke-width="4"/>
+    <circle cx="825" cy="305" r="23" fill="#ef4444"/><text x="818" y="313" style="font:700 20px sans-serif;fill:white">3</text>
+    <text x="865" y="313" class="step">Tìm trạm sạc</text>
+    <text x="810" y="370" class="body">Tra trạm còn chỗ,</text><text x="810" y="400" class="body">cổng tương thích và</text><text x="810" y="430" class="body">khoảng cách</text>
+    <text x="810" y="480" class="time">⏱ 5 phút</text><text x="810" y="518" class="bottle">● BOTTLENECK</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="1120" y="260" width="290" height="290" rx="24" fill="#fff7ed" stroke="#ef4444" stroke-width="4"/>
+    <circle cx="1165" cy="305" r="23" fill="#ef4444"/><text x="1158" y="313" style="font:700 20px sans-serif;fill:white">4</text>
+    <text x="1205" y="313" class="step">Soạn phương án</text>
+    <text x="1150" y="370" class="body">Kiểm tra an toàn,</text><text x="1150" y="400" class="body">viết chỉ đường hoặc</text><text x="1150" y="430" class="body">đề xuất cứu hộ</text>
+    <text x="1150" y="480" class="time">⏱ 5 phút</text><text x="1150" y="518" class="bottle">● BOTTLENECK</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="1460" y="280" width="250" height="250" rx="24" fill="#fff" stroke="#86efac" stroke-width="3"/>
+    <circle cx="1505" cy="325" r="23" fill="#22c55e"/><text x="1498" y="333" style="font:700 20px sans-serif;fill:white">5</text>
+    <text x="1545" y="323" class="step">Thực hiện</text>
+    <text x="1490" y="385" class="body">Gửi hướng dẫn</text><text x="1490" y="415" class="body">hoặc gọi cứu hộ</text>
+    <text x="1490" y="467" class="time">⏱ 1 phút</text><text x="1490" y="500" class="handoff">↻ Handoff</text>
+  </g>
+
+  <rect x="90" y="650" width="1620" height="235" rx="30" fill="#e0f2fe"/>
+  <text x="130" y="705" class="label">ĐIỂM CHÈN AI ĐỀ XUẤT</text>
+  <text x="130" y="755" class="step">LLM trích xuất dữ kiện → Rule engine bảo vệ boundary → LLM tạo [DRAFT_ONLY] → Điều phối viên duyệt</text>
+  <path d="M130 805 H1635" class="dash"/>
+  <text x="130" y="850" class="body">Fallback: thiếu dữ liệu / trạm không xác minh được / pin &lt;5% → không đoán, chuyển xử lý thủ công hoặc cứu hộ.</text>
+
+  <text x="90" y="975" class="footer">Lưu ý: thời gian là giả định của worked example trong Lab 02, cần xác minh bằng log vận hành trước pilot production.</text>
+</svg>
