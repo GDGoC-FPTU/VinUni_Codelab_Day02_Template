@@ -1,0 +1,152 @@
+{
+  "schema_version": "1.0",
+  "checked_at": "2026-09-12",
+  "purpose": "Mixed evidence-and-fixture dataset for the Xanh SM dispatcher lab.",
+  "production_warning": "Không dùng file này để điều phối xe thật. Trạng thái còn chỗ, khoảng cách đường bộ và khả năng hoạt động phải lấy từ hệ thống VinFast/V-GREEN được cấp quyền ở thời gian thực.",
+  "public_data_status": {
+    "official_consumer_map_exists": true,
+    "consumer_map_info_confirmed": [
+      "station address",
+      "available charging heads",
+      "travel time",
+      "travel distance",
+      "estimated battery on arrival"
+    ],
+    "official_consumer_map_source": "https://vinfastauto.com/vn_vi/su-dung-tinh-nang-lien-quan-den-pin-tren-ung-dung-vinfast",
+    "documented_public_live_api_found": false,
+    "api_research_note": "Không tìm thấy tài liệu API công khai chính thức của VinFast/V-GREEN cho vị trí và trạng thái đầu sạc. Việc website/app hiển thị dữ liệu không đồng nghĩa có API được phép tích hợp."
+  },
+  "official_network_facts": {
+    "charging_ports_vietnam": 150000,
+    "coverage_note": "V-GREEN stated more than 150,000 ports nationwide as of March 2025; a March 2026 Vingroup release says planning of 150,000 auto/motorbike ports had been completed by end-2025.",
+    "sources": [
+      "https://vgreen.net/vi/v-green-dat-muc-tieu-xay-dung-500000-cong-sac-oto-dien",
+            "https://ircdn.vingroup.net/storage/Uploads/0_Bao%20cao%20thuong%20nien/2025/VIE_Vingroup%20AR25.pdf"
+    ],
+    "connector_and_power_reference": {
+      "ac_connector": "Type 2",
+      "dc_connector": "CCS2",
+      "legacy_public_power_kw": [11, 30, 60, 250],
+      "source": "https://vinfastauto.com/vn_vi/tram-sac-tieu-chuan-chau-au-cua-vinfast"
+    },
+    "expanded_franchise_power_options_kw": [7.4, 11, 20, 30, 40, 60, 120, 150],
+    "expanded_franchise_source": "https://vgreen.net/vi/v-green-hop-tac-cung-fast-trien-khai-5000-tru-sac-xe-dien"
+  },
+  "real_sites_from_official_publication": [
+    {
+      "id": "REAL-AU-CO-464",
+      "name": "Trạm khu vực ngõ 464 Âu Cơ",
+      "address_as_published": "ngõ 464 Âu Cơ, Hà Nội",
+      "latitude": null,
+      "longitude": null,
+      "charger_count_as_published": 30,
+      "availability_live": null,
+      "commissioning_status_at_source_date": "operating",
+      "simulated": false,
+      "source": "https://vgreen.net/vi/nha-dau-tu-tiet-lo-ly-do-chon-v-green-chi-100-ty-dong-lam-tram-sac",
+      "note": "Nguồn không công bố tọa độ, loại từng đầu sạc hay trạng thái còn chỗ."
+    },
+    {
+      "id": "REAL-TRAN-VI-REGISTRATION-CENTRE",
+      "name": "Trạm Trung tâm đăng kiểm Trần Vĩ",
+      "address_as_published": "khu vực Trần Vĩ, Hà Nội",
+      "latitude": null,
+      "longitude": null,
+      "charger_count_as_published": 35,
+      "availability_live": null,
+      "commissioning_status_at_source_date": "planned for completion in July 2025",
+      "simulated": false,
+      "source": "https://vgreen.net/vi/nha-dau-tu-tiet-lo-ly-do-chon-v-green-chi-100-ty-dong-lam-tram-sac",
+      "note": "Không suy diễn rằng trạm hiện đang hoạt động; cần xác minh lại trên app/bản đồ chính thức."
+    },
+    {
+      "id": "REAL-DEN-LU-AREA",
+      "name": "Trạm khu vực Đền Lừ",
+      "address_as_published": "khu vực Đền Lừ, Hà Nội",
+      "latitude": null,
+      "longitude": null,
+      "charger_count_as_published": 22,
+      "availability_live": null,
+      "commissioning_status_at_source_date": "planned for completion in July 2025",
+      "simulated": false,
+      "source": "https://vgreen.net/vi/nha-dau-tu-tiet-lo-ly-do-chon-v-green-chi-100-ty-dong-lam-tram-sac",
+      "note": "Không suy diễn rằng trạm hiện đang hoạt động; cần xác minh lại trên app/bản đồ chính thức."
+    }
+  ],
+  "stations": [
+    {
+      "id": "SIM-HN-001",
+      "name": "Trạm mô phỏng Hồ Tây",
+      "latitude": 21.0587,
+      "longitude": 105.8172,
+      "connectors": [
+        {"type": "CCS2", "power_kw": 60, "total": 8, "available": 3},
+        {"type": "Type 2", "power_kw": 11, "total": 4, "available": 1}
+      ],
+      "available_ports": 4,
+      "status": "operating",
+      "status_timestamp": "2026-09-12T09:00:00+07:00",
+      "simulated": true,
+      "source": null
+    },
+    {
+      "id": "SIM-HN-002",
+      "name": "Trạm mô phỏng Cầu Giấy",
+      "latitude": 21.0364,
+      "longitude": 105.7906,
+      "connectors": [
+        {"type": "CCS2", "power_kw": 30, "total": 6, "available": 0},
+        {"type": "Type 2", "power_kw": 11, "total": 4, "available": 2}
+      ],
+      "available_ports": 2,
+      "status": "operating",
+      "status_timestamp": "2026-09-12T09:00:00+07:00",
+      "simulated": true,
+      "source": null
+    },
+    {
+      "id": "SIM-HN-003",
+      "name": "Trạm mô phỏng Đền Lừ",
+      "latitude": 20.9956,
+      "longitude": 105.8638,
+      "connectors": [
+        {"type": "CCS2", "power_kw": 150, "total": 10, "available": 5}
+      ],
+      "available_ports": 5,
+      "status": "operating",
+      "status_timestamp": "2026-09-12T09:00:00+07:00",
+      "simulated": true,
+      "source": null,
+      "note": "Tên khu vực lấy cảm hứng từ địa điểm nguồn có nhắc tới; tọa độ và toàn bộ trạng thái/cấu hình là dữ liệu lab mô phỏng, không đại diện trạm thật."
+    },
+    {
+      "id": "SIM-HN-004",
+      "name": "Trạm mô phỏng Long Biên",
+      "latitude": 21.0264,
+      "longitude": 105.8997,
+      "connectors": [
+        {"type": "CCS2", "power_kw": 60, "total": 12, "available": 7},
+        {"type": "Type 2", "power_kw": 11, "total": 4, "available": 4}
+      ],
+      "available_ports": 11,
+      "status": "operating",
+      "status_timestamp": "2026-09-12T09:00:00+07:00",
+      "simulated": true,
+      "source": null
+    },
+    {
+      "id": "SIM-HN-005",
+      "name": "Trạm mô phỏng Thanh Xuân",
+      "latitude": 20.9971,
+      "longitude": 105.8049,
+      "connectors": [
+        {"type": "CCS2", "power_kw": 250, "total": 4, "available": 1}
+      ],
+      "available_ports": 1,
+      "status": "operating",
+      "status_timestamp": "2026-09-12T09:00:00+07:00",
+      "simulated": true,
+      "source": null
+    }
+  ]
+}
