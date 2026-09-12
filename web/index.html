@@ -3,8 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="ChargeSafe Copilot — bản nháp hỗ trợ điều phối sự cố pin Xanh SM." />
-    <title>ChargeSafe Copilot · Bàn điều phối</title>
+    <meta name="description" content="ChargeSafe Copilot Ver 2 — Trợ lý điều phối sự cố pin Xanh SM tối ưu lộ trình và kiểm soát an toàn." />
+    <title>ChargeSafe Copilot Ver 2 · Bàn điều phối</title>
+    <!-- Leaflet OpenStreetMap CDN with offline canvas fallback -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
@@ -12,7 +15,7 @@
     <header class="masthead">
       <a class="brand" href="/" aria-label="ChargeSafe Copilot — trang chính">
         <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span>ChargeSafe <b>Copilot</b></span>
+        <span>ChargeSafe <b>Copilot</b> <span class="ver-badge">v2</span></span>
       </a>
       <div class="status-cluster">
         <span class="live-status"><i aria-hidden="true"></i><span id="runtime-label">Đang kết nối</span></span>
@@ -23,120 +26,250 @@
     <main>
       <section class="hero" aria-labelledby="page-title">
         <div class="hero-copy">
-          <p class="eyebrow">Bàn điều phối sự cố pin · Prototype lab</p>
-          <h1 id="page-title">Biến tín hiệu bên đường thành <em>quyết định có thể kiểm chứng.</em></h1>
-          <p class="hero-intro">Rule engine chọn hành động an toàn. AI chỉ soạn lời nhắn. Điều phối viên luôn là người quyết định cuối.</p>
+          <p class="eyebrow">Bàn điều phối sự cố pin · Ver 2 Smart Routing</p>
+          <h1 id="page-title">Tối ưu trạm sạc <em>tiện đường lộ trình</em> & bảo đảm an toàn pin.</h1>
+          <p class="hero-intro">Định vị GPS tự động, bộ lọc bán kính linh hoạt, thuật toán tối ưu waypoint tránh đi ngược hướng, bản đồ tương tác và liên kết Google Maps chỉ đường.</p>
         </div>
-        <div class="route-ribbon" aria-label="Quy trình: nhận tín hiệu, kiểm tra an toàn, điều phối viên duyệt">
+        <div class="route-ribbon" aria-label="Quy trình: nhận tín hiệu, tối ưu lộ trình, guardrail an toàn, điều phối viên duyệt">
           <div class="route-line" aria-hidden="true"><span></span></div>
-          <div class="route-stop is-active"><b>Nhận tín hiệu</b><small>Xe · Pin · GPS</small></div>
-          <div class="route-stop"><b>Guardrail quyết định</b><small>Không để LLM tự chọn</small></div>
-          <div class="route-stop"><b>Người duyệt</b><small>Không tự động gửi</small></div>
+          <div class="route-stop is-active"><b>1. Vị trí & Điểm đến</b><small>GPS · Điểm đến · Slider Bán kính</small></div>
+          <div class="route-stop"><b>2. Tối ưu Lộ trình</b><small>Ưu tiên tiện đường, phạt đi lùi</small></div>
+          <div class="route-stop"><b>3. Guardrail & Duyệt</b><small>Fail-closed · Pin &lt; 5% cứu hộ</small></div>
+        </div>
+      </section>
+
+      <!-- Interactive Map Section -->
+      <section class="map-section" aria-label="Bản đồ điều phối và lộ trình trạm sạc">
+        <div class="map-toolbar">
+          <div class="map-title-row">
+            <span class="step-label">Bản đồ tương tác thời gian thực</span>
+            <span id="map-mode-indicator" class="map-mode-badge">Chế độ: Đang chọn vị trí xe</span>
+          </div>
+          <div class="map-btn-group">
+            <button type="button" id="btn-pick-origin" class="map-tool-btn is-active" title="Nhấp chuột trên bản đồ để chọn tọa độ xe">🚗 Đặt vị trí xe</button>
+            <button type="button" id="btn-pick-dest" class="map-tool-btn" title="Nhấp chuột trên bản đồ để chọn điểm đến">🎯 Đặt điểm đến</button>
+            <button type="button" id="btn-reset-map" class="map-tool-btn" title="Căn chỉnh toàn bộ lộ trình và các trạm">⟲ Căn giữa bản đồ</button>
+          </div>
+        </div>
+        <div id="leaflet-map" class="map-canvas-container"></div>
+        <div id="canvas-radar-container" class="canvas-radar-container" hidden>
+          <canvas id="radar-canvas" width="1200" height="420"></canvas>
+          <p class="canvas-hint">Chế độ đồ họa Canvas offline (Không có kết nối CDN OpenStreetMap)</p>
         </div>
       </section>
 
       <div class="workspace">
+        <!-- Intake Panel -->
         <section class="intake-panel" aria-labelledby="intake-title">
           <div class="section-heading">
             <div>
-              <p class="step-label">Tín hiệu đầu vào</p>
-              <h2 id="intake-title">Xe đang ở đâu?</h2>
+              <p class="step-label">Tín hiệu đầu vào & Lộ trình</p>
+              <h2 id="intake-title">Thông số điều phối</h2>
             </div>
-            <button class="text-button" id="fill-sample" type="button">Điền ca mẫu</button>
+            <div class="heading-actions">
+              <button class="text-button" id="fill-sample" type="button">Ca mẫu: VinUni</button>
+              <button class="text-button" id="fill-sample-noi-bai" type="button">Ca mẫu: Nội Bài</button>
+            </div>
           </div>
 
           <form id="incident-form">
             <div class="form-grid">
               <label>
-                <span>Dòng xe</span>
+                <span>Dòng xe VinFast</span>
                 <select id="vehicle-model" name="vehicle_model" required>
                   <option value="">Đang nạp dữ liệu…</option>
                 </select>
               </label>
+
               <label>
                 <span>Mức pin hiện tại</span>
-                <span class="input-with-unit"><input id="battery" name="battery_percent" type="number" min="0" max="100" step="0.1" inputmode="decimal" placeholder="18" required /><b>%</b></span>
-              </label>
-              <label>
-                <span>Vĩ độ</span>
-                <input id="latitude" name="latitude" type="number" min="-90" max="90" step="any" inputmode="decimal" placeholder="21.0285" required />
-              </label>
-              <label>
-                <span>Kinh độ</span>
-                <input id="longitude" name="longitude" type="number" min="-180" max="180" step="any" inputmode="decimal" placeholder="105.8542" required />
+                <span class="input-with-unit">
+                  <input id="battery" name="battery_percent" type="number" min="0" max="100" step="0.1" inputmode="decimal" placeholder="25" required />
+                  <b>%</b>
+                </span>
               </label>
             </div>
+
+            <!-- Geolocation & Coordinates -->
+            <div class="location-box">
+              <div class="location-box-header">
+                <span class="field-title">Tọa độ xe hiện tại (GPS)</span>
+                <button class="btn-location" id="btn-geolocation" type="button" title="Lấy vị trí GPS từ thiết bị của bạn">
+                  <span class="loc-icon">📍</span>
+                  <span>Lấy vị trí hiện tại của tôi</span>
+                </button>
+              </div>
+              <div class="coords-row">
+                <label>
+                  <span>Vĩ độ (Lat)</span>
+                  <input id="latitude" name="latitude" type="number" min="-90" max="90" step="any" inputmode="decimal" placeholder="21.0300" required />
+                </label>
+                <label>
+                  <span>Kinh độ (Lon)</span>
+                  <input id="longitude" name="longitude" type="number" min="-180" max="180" step="any" inputmode="decimal" placeholder="105.7800" required />
+                </label>
+              </div>
+              <p id="location-status" class="location-status" hidden></p>
+            </div>
+
+            <!-- Search Radius Slider -->
+            <div class="slider-group">
+              <div class="slider-header">
+                <div>
+                  <span class="field-title">Bán kính tìm kiếm trạm</span>
+                  <small class="slider-sub">Điều chỉnh vòng quét tìm trạm quanh xe</small>
+                </div>
+                <span class="radius-badge" id="radius-value-label">15 km</span>
+              </div>
+              <input type="range" id="radius-slider" name="radius_km" min="1" max="30" step="1" value="15" />
+              <div class="slider-ticks">
+                <span>1 km</span>
+                <span>10 km</span>
+                <span>20 km</span>
+                <span>30 km</span>
+              </div>
+            </div>
+
+            <!-- Destination & En-Route Routing -->
+            <div class="destination-group">
+              <div class="destination-header">
+                <div>
+                  <span class="field-title">Điểm đến mong muốn (Tối ưu tiện đường)</span>
+                  <small class="dest-sub">Hệ thống sẽ ưu tiên trạm cùng hướng, phạt trạm đi ngược hướng</small>
+                </div>
+                <select id="landmark-select" class="landmark-select">
+                  <option value="">-- Chọn điểm đến mẫu --</option>
+                </select>
+              </div>
+              <input id="destination" name="destination" type="text" placeholder="Nhập địa danh (VinUni, Sân bay Nội Bài, Hoàn Kiếm, v.v.) hoặc nhấp bản đồ" />
+              <input type="hidden" id="destination_lat" name="destination_lat" />
+              <input type="hidden" id="destination_lon" name="destination_lon" />
+            </div>
+
+            <!-- Driver Message -->
             <label class="message-field">
-              <span>Tài xế mô tả gì?</span>
-              <textarea id="message" name="message" rows="4" maxlength="2000" placeholder="Ví dụ: Xe đang đỗ an toàn, cần tìm trạm phù hợp gần nhất."></textarea>
+              <span>Tin nhắn từ tài xế / Lời nhắc</span>
+              <textarea id="message" name="message" rows="3" maxlength="2000" placeholder="Ví dụ: Xe đang đi về VinUni Ocean Park, pin còn 25%, cần trạm tiện đường sạc nhanh."></textarea>
             </label>
 
             <div class="form-footer">
-              <p><span aria-hidden="true">◇</span> Không nhập biển số, số điện thoại hoặc dữ liệu cá nhân.</p>
+              <p><span aria-hidden="true">◇</span> Nguyên tắc an toàn: Pin &lt; 5% kích hoạt cứu hộ lưu động. HITL luôn bắt buộc.</p>
               <button class="primary-button" id="dispatch-button" type="submit">
-                <span>Đánh giá phương án</span><span aria-hidden="true">→</span>
+                <span>Đánh giá &amp; Tìm trạm tiện đường</span><span aria-hidden="true">→</span>
               </button>
             </div>
           </form>
         </section>
 
+        <!-- Decision Panel -->
         <section class="decision-panel" aria-labelledby="decision-title" aria-live="polite" aria-busy="false">
           <div class="section-heading">
             <div>
-              <p class="step-label">Kết quả guardrail</p>
-              <h2 id="decision-title">Bản nháp điều phối</h2>
+              <p class="step-label">Kết quả phân tích &amp; Guardrail</p>
+              <h2 id="decision-title">Phương án điều phối</h2>
             </div>
             <span class="decision-status" id="decision-status">Chưa đánh giá</span>
           </div>
 
           <div id="empty-result" class="empty-result">
             <div class="empty-signal" aria-hidden="true"><span></span></div>
-            <p>Nhập tín hiệu từ tài xế để xem hành động, mức rủi ro và trạm phù hợp.</p>
+            <p>Nhập thông số hoặc bấm <strong>"📍 Lấy vị trí hiện tại"</strong> và chọn điểm đến để hệ thống tính toán trạm sạc tiện đường nhất.</p>
           </div>
 
           <div id="result" class="result" hidden>
-            <div class="decision-route" aria-hidden="true"><span id="battery-node">—%</span><i></i><span id="action-node">Đợi</span><i></i><span>DUYỆT</span></div>
+            <div class="decision-route" aria-hidden="true">
+              <span id="battery-node">—%</span>
+              <i></i>
+              <span id="action-node">TRẠM</span>
+              <i></i>
+              <span id="route-tag-node">LỘ TRÌNH</span>
+              <i></i>
+              <span>DUYỆT</span>
+            </div>
 
+            <!-- Decision Facts -->
             <dl class="decision-facts">
-              <div><dt>Hành động</dt><dd id="action-value">—</dd></div>
-              <div><dt>Mức rủi ro</dt><dd id="risk-value">—</dd></div>
-              <div><dt>Ngưỡng lab (không phải telemetry)</dt><dd id="range-value">—</dd></div>
+              <div><dt>Hành động an toàn</dt><dd id="action-value">—</dd></div>
+              <div><dt>Mức độ rủi ro</dt><dd id="risk-value">—</dd></div>
+              <div><dt>Ngưỡng an toàn pin (Lab)</dt><dd id="range-value">—</dd></div>
+              <div id="detour-fact"><dt>Độ lệch lộ trình (Detour)</dt><dd id="detour-value">—</dd></div>
             </dl>
 
+            <!-- Recommended Station Card -->
             <article class="station-card" id="station-card" hidden>
-              <p>Trạm được đề xuất</p>
+              <div class="station-card-top">
+                <p>Trạm sạc tối ưu nhất</p>
+                <span id="station-tag" class="route-tag-badge">Tiện đường</span>
+              </div>
               <h3 id="station-name">—</h3>
-              <div class="station-meta"><span id="station-distance">—</span><span id="station-ports">—</span><span id="station-connectors">—</span></div>
+              <div class="station-meta">
+                <span id="station-distance">—</span>
+                <span id="station-ports">—</span>
+                <span id="station-connectors">—</span>
+              </div>
               <p class="station-address" id="station-address">—</p>
+
+              <!-- Google Maps Link Button -->
+              <a id="google-maps-link" href="#" target="_blank" rel="noopener noreferrer" class="google-maps-btn" hidden>
+                <span class="gmaps-icon">🗺️</span>
+                <div class="gmaps-text">
+                  <strong>Mở chỉ đường trên Google Maps</strong>
+                  <small id="gmaps-subtext">Lộ trình: Xe → Trạm sạc → Điểm đến</small>
+                </div>
+                <span class="gmaps-arrow">↗</span>
+              </a>
             </article>
 
+            <!-- Nearby Candidates List in Radius -->
+            <section class="nearby-section" id="nearby-section" hidden>
+              <div class="nearby-header">
+                <div>
+                  <h4>So sánh các trạm trong bán kính (<span id="nearby-count">0</span>)</h4>
+                  <small>Được sắp xếp theo điểm số tiện đường &amp; mức an toàn pin</small>
+                </div>
+              </div>
+              <div class="nearby-cards" id="nearby-cards"></div>
+            </section>
+
+            <!-- Decision Reason -->
             <div class="reason-block">
-              <p>Lý do quyết định</p>
+              <p>Lý do &amp; Căn cứ thuật toán</p>
               <p id="reason-value">—</p>
             </div>
 
+            <!-- Draft Message -->
             <div class="draft-message">
-              <div><p>Tin nhắn dự thảo</p><span>DRAFT_ONLY</span></div>
+              <div><p>Tin nhắn dự thảo cho tài xế</p><span>DRAFT_ONLY</span></div>
               <blockquote id="message-value">—</blockquote>
             </div>
 
+            <!-- Human Approval Gate -->
             <div class="approval-gate">
               <div class="approval-icon" aria-hidden="true">✓</div>
-              <div><b>Chờ điều phối viên duyệt</b><p>Kiểm tra lại telemetry và trạng thái trụ trên hệ thống vận hành chính thức trước khi gửi.</p></div>
-              <label class="approval-check"><input id="approval-check" type="checkbox" /><span>Tôi đã kiểm tra</span></label>
+              <div>
+                <b>Chờ điều phối viên duyệt (HITL)</b>
+                <p>Kiểm tra tình trạng trụ thực tế và telemetry trước khi phát lệnh điều phối.</p>
+              </div>
+              <label class="approval-check">
+                <input id="approval-check" type="checkbox" />
+                <span>Tôi đã xác minh</span>
+              </label>
             </div>
           </div>
         </section>
       </div>
 
       <aside class="data-notice" aria-label="Lưu ý dữ liệu">
-        <b>Dữ liệu trạm mô phỏng</b>
-        <p id="data-notice-text">Vị trí và tình trạng còn chỗ chỉ phục vụ bài lab; không dùng để điều phối xe thật.</p>
+        <b>Dữ liệu trạm mô phỏng lab</b>
+        <p id="data-notice-text">Vị trí và tình trạng còn chỗ chỉ phục vụ bài lab; không dùng để điều phối xe thật trên thực địa.</p>
         <span id="data-count">— bản ghi</span>
       </aside>
     </main>
 
-    <footer><span>ChargeSafe Copilot · VinUni Codelab</span><span>Rule-based safety · Gemini chỉ soạn nháp</span></footer>
+    <footer>
+      <span>ChargeSafe Copilot Ver 2 · VinUni Codelab</span>
+      <span>Tối ưu Waypoint · Trực quan hóa Leaflet/Google Maps · Rule-based Safety Guardrail</span>
+    </footer>
     <script src="/app.js" defer></script>
   </body>
 </html>

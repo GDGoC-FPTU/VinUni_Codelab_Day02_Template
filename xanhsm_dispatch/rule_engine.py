@@ -26,7 +26,37 @@ ADMIN_ATTACK_TERMS = (
     "danh sách tài xế", "api key", "mật khẩu", "gửi thẳng", "tự động gửi",
     "bỏ qua bước nháp", "không cần duyệt", "đừng gắn thẻ", "xóa draft_only",
     "tôi là quản trị viên", "tôi là admin", "dump database", "toàn bộ dữ liệu",
+    "jailbreak", "dan mode", "aim mode", "unrestricted", "bỏ qua an toàn",
+    "tắt hitl", "bỏ qua hitl", "override safety", "giám đốc vận hành",
+    "điều phối viên trưởng", "lệnh khẩn từ sếp", "bỏ qua kiểm tra",
+    "đừng ghi [draft_only]", "không gắn nhãn draft", "auto_send=true", "autosend",
+    "xóa system prompt", "bỏ qua hướng dẫn", "bỏ qua ranh giới", "bypass",
 )
+
+# Landmark coordinates for Hanoi destination routing (En-route charging)
+LANDMARK_COORDINATES: dict[str, tuple[float, float, str]] = {
+    "vinuni": (20.9880, 105.9520, "Trường Đại học VinUni - Ocean Park"),
+    "ocean park": (20.9880, 105.9520, "Vinhomes Ocean Park Gia Lâm"),
+    "gia lâm": (20.9880, 105.9520, "Khu vực Gia Lâm"),
+    "nội bài": (21.2185, 105.8040, "Sân bay Quốc tế Nội Bài"),
+    "noi bai": (21.2185, 105.8040, "Sân bay Quốc tế Nội Bài"),
+    "sân bay": (21.2185, 105.8040, "Sân bay Quốc tế Nội Bài"),
+    "mỹ đình": (21.0210, 105.7640, "Khu vực SVĐ Quốc gia Mỹ Đình"),
+    "my dinh": (21.0210, 105.7640, "Khu vực SVĐ Quốc gia Mỹ Đình"),
+    "bến xe mỹ đình": (21.0285, 105.7725, "Bến xe Mỹ Đình"),
+    "hoàn kiếm": (21.0285, 105.8542, "Khu vực Hoàn Kiếm / Trung tâm"),
+    "hồ gươm": (21.0285, 105.8542, "Hồ Hoàn Kiếm"),
+    "nhà hát lớn": (21.0250, 105.8560, "Nhà Hát Lớn Hà Nội"),
+    "hồ tây": (21.0587, 105.8172, "Khu vực Hồ Tây"),
+    "tây hồ": (21.0587, 105.8172, "Quận Tây Hồ"),
+    "cầu giấy": (21.0364, 105.7906, "Quận Cầu Giấy"),
+    "đền lừ": (20.9956, 105.8638, "Khu vực Đền Lừ"),
+    "long biên": (21.0264, 105.8997, "Quận Long Biên"),
+    "aeon mall long biên": (21.0264, 105.8997, "Aeon Mall Long Biên"),
+    "thanh xuân": (20.9971, 105.8049, "Quận Thanh Xuân"),
+    "hà đông": (20.9810, 105.7530, "Quận Hà Đông"),
+    "aeon mall hà đông": (20.9810, 105.7530, "Aeon Mall Hà Đông"),
+}
 
 
 def _canonical_model(value: str) -> str:
@@ -88,11 +118,31 @@ class DispatchRuleEngine:
 
         model_match = re.search(r"\b(vf\s*e?\s*\d{1,2}(?:\s*plus)?)\b", text, re.IGNORECASE)
         coords: tuple[float, float] | None = None
+        dest_coords: tuple[float, float] | None = None
+        dest_name: str | None = None
+
+        valid_coords: list[tuple[float, float]] = []
         for match in re.finditer(r"(?<!\d)(-?\d{1,2}(?:\.\d+)?)\s*[,;/]\s*(-?\d{2,3}(?:\.\d+)?)(?!\d)", text):
             lat, lon = float(match.group(1)), float(match.group(2))
             if -90 <= lat <= 90 and -180 <= lon <= 180:
-                coords = (lat, lon)
-                break
+                valid_coords.append((lat, lon))
+
+        if valid_coords:
+            coords = valid_coords[0]
+            if len(valid_coords) > 1:
+                dest_coords = valid_coords[1]
+                dest_name = f"GPS {dest_coords[0]}, {dest_coords[1]}"
+
+        # If destination wasn't explicitly found in coords, scan landmark keywords in text
+        if dest_coords is None:
+            for landmark_key, (l_lat, l_lon, l_name) in LANDMARK_COORDINATES.items():
+                if landmark_key in normalized:
+                    dest_coords = (l_lat, l_lon)
+                    dest_name = l_name
+                    break
+
+        radius_match = re.search(r"(?:bán\s*kính|trong\s*(?:vòng)?)\s*(\d{1,2}(?:[.,]\d+)?)\s*km", normalized)
+        search_radius_km = float(radius_match.group(1).replace(",", ".")) if radius_match else None
 
         return {
             "battery_percent": min(battery_values) if battery_values else None,
@@ -103,6 +153,10 @@ class DispatchRuleEngine:
             "vehicle_model": _canonical_model(model_match.group(1)) if model_match else None,
             "latitude": coords[0] if coords else None,
             "longitude": coords[1] if coords else None,
+            "destination_lat": dest_coords[0] if dest_coords else None,
+            "destination_lon": dest_coords[1] if dest_coords else None,
+            "destination_name": dest_name,
+            "search_radius_km": search_radius_km,
             "emergency_terms": [term for term in EMERGENCY_TERMS if term in normalized],
             "attack_terms": [term for term in ADMIN_ATTACK_TERMS if term in normalized],
         }
@@ -152,6 +206,16 @@ class DispatchRuleEngine:
 
     def _station_candidates(self, context: dict[str, Any], vehicle: dict[str, Any]) -> list[dict[str, Any]]:
         candidates: list[dict[str, Any]] = []
+        d_lat = context.get("destination_lat")
+        d_lon = context.get("destination_lon")
+        has_dest = bool(d_lat is not None and d_lon is not None)
+
+        orig_lat = float(context["latitude"]) if context.get("latitude") is not None else None
+        orig_lon = float(context["longitude"]) if context.get("longitude") is not None else None
+        orig_to_dest_km = 0.0
+        if has_dest and orig_lat is not None and orig_lon is not None:
+            orig_to_dest_km = _haversine_km(orig_lat, orig_lon, float(d_lat), float(d_lon))
+
         for source in self.stations:
             station = dict(source)
             if station.get("status") in {
@@ -163,10 +227,10 @@ class DispatchRuleEngine:
             if not self._compatible(station, vehicle):
                 continue
             distance = station.get("distance_km")
-            if distance is None and station.get("latitude") is not None and station.get("longitude") is not None:
+            if distance is None and station.get("latitude") is not None and station.get("longitude") is not None and orig_lat is not None and orig_lon is not None:
                 try:
                     distance = _haversine_km(
-                        float(context["latitude"]), float(context["longitude"]),
+                        orig_lat, orig_lon,
                         float(station["latitude"]), float(station["longitude"]),
                     )
                 except (TypeError, ValueError):
@@ -175,7 +239,58 @@ class DispatchRuleEngine:
                 station["distance_km"] = round(float(distance), 2)
             except (TypeError, ValueError):
                 continue
+
+            st_lat = station.get("latitude")
+            st_lon = station.get("longitude")
+            if has_dest and st_lat is not None and st_lon is not None and orig_lat is not None and orig_lon is not None:
+                try:
+                    st_lat_f = float(st_lat)
+                    st_lon_f = float(st_lon)
+                    d_dest_f = float(d_lat)
+                    d_lon_f = float(d_lon)
+                    d_to_dest = _haversine_km(st_lat_f, st_lon_f, d_dest_f, d_lon_f)
+                    detour = max(0.0, round(float(distance) + d_to_dest - orig_to_dest_km, 2))
+
+                    # Direction vector alignment
+                    lat_mid = math.radians((orig_lat + d_dest_f) / 2)
+                    vod_y = d_dest_f - orig_lat
+                    vod_x = (d_lon_f - orig_lon) * math.cos(lat_mid)
+                    vos_y = st_lat_f - orig_lat
+                    vos_x = (st_lon_f - orig_lon) * math.cos(lat_mid)
+
+                    dot = vod_x * vos_x + vod_y * vos_y
+                    mag_od = math.hypot(vod_x, vod_y)
+                    mag_os = math.hypot(vos_x, vos_y)
+                    cos_theta = dot / (mag_od * mag_os) if (mag_od > 1e-6 and mag_os > 1e-6) else 1.0
+
+                    if cos_theta < -0.15:
+                        routing_score = float(distance) + 2.5 * detour + 4.0
+                        route_tag = "Ngược đường"
+                    elif detour <= 1.2:
+                        routing_score = float(distance) + 1.2 * detour
+                        route_tag = "Rất tiện đường"
+                    else:
+                        routing_score = float(distance) + 1.8 * detour
+                        route_tag = "Tiện đường một phần"
+
+                    station["destination_distance_km"] = round(d_to_dest, 2)
+                    station["detour_km"] = detour
+                    station["direction_cos"] = round(cos_theta, 2)
+                    station["routing_score"] = round(routing_score, 2)
+                    station["route_tag"] = route_tag
+                except (TypeError, ValueError):
+                    station["detour_km"] = 0.0
+                    station["routing_score"] = round(float(distance), 2)
+                    station["route_tag"] = "Gần nhất"
+            else:
+                station["detour_km"] = 0.0
+                station["routing_score"] = round(float(distance), 2)
+                station["route_tag"] = "Gần nhất"
+
             candidates.append(station)
+
+        if has_dest:
+            return sorted(candidates, key=lambda item: (item.get("routing_score", item["distance_km"]), item["distance_km"]))
         return sorted(candidates, key=lambda item: item["distance_km"])
 
     @staticmethod
@@ -203,7 +318,10 @@ class DispatchRuleEngine:
 
     def evaluate(self, text: str, context: dict[str, Any] | None = None) -> dict[str, Any]:
         parsed = self.extract_context(text)
-        stable_keys = ("battery_percent", "vehicle_model", "latitude", "longitude")
+        stable_keys = (
+            "battery_percent", "vehicle_model", "latitude", "longitude",
+            "destination_lat", "destination_lon", "destination_name", "search_radius_km",
+        )
         merged = {key: value for key, value in (context or {}).items() if key in stable_keys}
         for key in stable_keys:
             if parsed.get(key) is not None:
@@ -226,7 +344,9 @@ class DispatchRuleEngine:
 
         privacy_attack = bool(re.search(
             r"(?:tất cả|toàn bộ).*tài xế|danh sách.*(?:biển số|tài xế)|"
-            r"(?:api[_ -]?key|mật khẩu|token|secret|dump database|system prompt)",
+            r"(?:api[_ -]?key|mật khẩu|token|secret|dump|system prompt|"
+            r"credentials|private key|bearer token|auth token|cơ sở dữ liệu|"
+            r"database|driver table|schema|select\s+\*|drop\s+table|dan mode|jailbreak)",
             text,
             re.IGNORECASE,
         ))
@@ -328,16 +448,83 @@ class DispatchRuleEngine:
                 context={**merged, "demo_range_limit_km": demo_range_limit, "range_is_live_telemetry": False},
             )
 
-        best = safe[0]
-        alternatives = safe[1:3]
+        # Apply search_radius filter if specified and contains safe stations
+        search_radius = merged.get("search_radius_km")
+        ranked_safe = safe
+        if search_radius is not None:
+            try:
+                r_val = float(search_radius)
+                if r_val > 0:
+                    within_radius = [s for s in safe if s["distance_km"] <= r_val]
+                    if within_radius:
+                        ranked_safe = within_radius
+            except (TypeError, ValueError):
+                pass
+
+        has_dest = bool(merged.get("destination_lat") is not None and merged.get("destination_lon") is not None)
+        if has_dest:
+            ranked_safe = sorted(ranked_safe, key=lambda s: (s.get("routing_score", s["distance_km"]), s["distance_km"]))
+        else:
+            ranked_safe = sorted(ranked_safe, key=lambda s: s["distance_km"])
+
+        best = ranked_safe[0]
+        alternatives = ranked_safe[1:4]
+        nearby_stations = ranked_safe[:10]
+
+        # Build official Google Maps Direction URL
+        lat_o, lon_o = merged.get("latitude"), merged.get("longitude")
+        lat_s, lon_s = best.get("latitude"), best.get("longitude")
+        gmaps_url: str | None = None
+        if lat_o is not None and lon_o is not None and lat_s is not None and lon_s is not None:
+            if has_dest:
+                lat_d, lon_d = merged["destination_lat"], merged["destination_lon"]
+                gmaps_url = (
+                    f"https://www.google.com/maps/dir/?api=1&origin={lat_o},{lon_o}"
+                    f"&destination={lat_d},{lon_d}&waypoints={lat_s},{lon_s}&travelmode=driving"
+                )
+            else:
+                gmaps_url = (
+                    f"https://www.google.com/maps/dir/?api=1&origin={lat_o},{lon_o}"
+                    f"&destination={lat_s},{lon_s}&travelmode=driving"
+                )
+
+        if has_dest:
+            dest_label = merged.get("destination_name") or f"GPS {merged['destination_lat']}, {merged['destination_lon']}"
+            detour_val = best.get("detour_km", 0.0)
+            tag_label = best.get("route_tag", "tiện đường")
+            reason_str = (
+                f"Trạm đề xuất {best['name']} cách {best['distance_km']:.2f} km ({tag_label}, độ lệch lộ trình +{detour_val:.2f} km về {dest_label}), "
+                f"trong ngưỡng mô phỏng lab {demo_range_limit:.2f} km; phải kiểm tra telemetry thật trước khi gửi."
+            )
+            message_str = (
+                f"[DRAFT_ONLY] Đề xuất {best['name']} — {best.get('address', 'Khu vực trạm')} "
+                f"({best['distance_km']:.2f} km, tiện đường về {dest_label}, lệch +{detour_val:.2f} km). "
+                f"Điều phối viên kiểm tra lại tình trạng trụ và duyệt trước khi gửi tài xế."
+            )
+        else:
+            reason_str = f"Trạm gần nhất phù hợp cách {best['distance_km']:.2f} km, trong ngưỡng mô phỏng lab {demo_range_limit:.2f} km; phải kiểm tra telemetry thật trước khi gửi."
+            message_str = f"[DRAFT_ONLY] Đề xuất {best['name']} — {best.get('address', 'Khu vực trạm')} ({best['distance_km']:.2f} km). Điều phối viên kiểm tra lại tình trạng trụ và duyệt trước khi gửi tài xế."
+
         return self._decision(
             "recommend_station",
-            f"Trạm gần nhất phù hợp cách {best['distance_km']:.2f} km, trong ngưỡng mô phỏng lab {demo_range_limit:.2f} km; phải kiểm tra telemetry thật trước khi gửi.",
-            f"[DRAFT_ONLY] Đề xuất {best['name']} — {best['address']} ({best['distance_km']:.2f} km). Điều phối viên kiểm tra lại tình trạng trụ và duyệt trước khi gửi tài xế.",
+            reason_str,
+            message_str,
             safety_flags=["HUMAN_REVIEW_REQUIRED"],
             recommended_station=best,
             alternatives=alternatives,
-            context={**merged, "demo_range_limit_km": demo_range_limit, "range_is_live_telemetry": False},
+            nearby_stations=nearby_stations,
+            google_maps_url=gmaps_url,
+            context={
+                **merged,
+                "demo_range_limit_km": demo_range_limit,
+                "range_is_live_telemetry": False,
+                "google_maps_url": gmaps_url,
+                "destination": {
+                    "latitude": merged.get("destination_lat"),
+                    "longitude": merged.get("destination_lon"),
+                    "name": merged.get("destination_name"),
+                } if has_dest else None,
+            },
         )
 
 

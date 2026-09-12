@@ -51,6 +51,15 @@ class ChargeSafeApplication:
                 {"value": value, "label": label} for value, label in sorted(models.items())
             ],
             "station_records": len(self.engine.stations),
+            "stations": self.engine.stations,
+            "landmarks": [
+                {"key": "vinuni", "name": "VinUni - Ocean Park Gia Lâm", "lat": 20.9880, "lon": 105.9520},
+                {"key": "noi_bai", "name": "Sân bay Quốc tế Nội Bài", "lat": 21.2185, "lon": 105.8040},
+                {"key": "my_dinh", "name": "SVĐ Quốc gia Mỹ Đình", "lat": 21.0210, "lon": 105.7640},
+                {"key": "hoan_kiem", "name": "Hồ Hoàn Kiếm / Tràng Tiền", "lat": 21.0285, "lon": 105.8542},
+                {"key": "ha_dong", "name": "Aeon Mall Hà Đông", "lat": 20.9810, "lon": 105.7530},
+                {"key": "tay_ho", "name": "Hồ Tây / Quảng An", "lat": 21.0587, "lon": 105.8172},
+            ],
             "data_notice": "Dữ liệu vị trí và trạng thái trạm trong demo là mô phỏng, không dùng để điều phối xe thật.",
         }
 
@@ -63,6 +72,10 @@ class ChargeSafeApplication:
             ("battery_percent", "battery_percent"),
             ("latitude", "latitude"),
             ("longitude", "longitude"),
+            ("radius_km", "search_radius_km"),
+            ("search_radius_km", "search_radius_km"),
+            ("destination_lat", "destination_lat"),
+            ("destination_lon", "destination_lon"),
         ):
             value = payload.get(source)
             try:
@@ -70,11 +83,25 @@ class ChargeSafeApplication:
             except (TypeError, ValueError):
                 context[target] = None
 
-        # Include the structured fields in the audit text while letting the
-        # deterministic engine receive them as explicit context.
+        dest_name = str(payload.get("destination", "") or payload.get("destination_name", "")).strip()[:100]
+        if dest_name:
+            context["destination_name"] = dest_name
+            from xanhsm_dispatch.rule_engine import LANDMARK_COORDINATES
+            dest_lower = dest_name.lower()
+            for l_key, (l_lat, l_lon, l_official) in LANDMARK_COORDINATES.items():
+                if l_key in dest_lower:
+                    if context.get("destination_lat") is None:
+                        context["destination_lat"] = l_lat
+                        context["destination_lon"] = l_lon
+                    context["destination_name"] = l_official
+                    break
+
+        dest_info = f", Điểm đến: {context.get('destination_name') or 'GPS ' + str(context.get('destination_lat')) + ',' + str(context.get('destination_lon'))}" if context.get('destination_name') or context.get('destination_lat') else ""
+        radius_info = f", Bán kính: {context.get('search_radius_km')} km" if context.get('search_radius_km') else ""
         incident_text = (
             f"Dòng xe {model or 'chưa rõ'}, pin {payload.get('battery_percent', 'chưa rõ')}%, "
-            f"GPS {payload.get('latitude', 'chưa rõ')}, {payload.get('longitude', 'chưa rõ')}. "
+            f"GPS {payload.get('latitude', 'chưa rõ')}, {payload.get('longitude', 'chưa rõ')}"
+            f"{dest_info}{radius_info}. "
             f"Ghi chú điều phối viên: {message or 'Không có ghi chú.'}"
         )
         decision = self.engine.evaluate(incident_text, context=context)

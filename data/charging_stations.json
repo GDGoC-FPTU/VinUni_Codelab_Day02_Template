@@ -147,6 +147,79 @@
       "status_timestamp": "2026-09-12T09:00:00+07:00",
       "simulated": true,
       "source": null
+    },
+    {
+      "id": "SIM-HN-006",
+      "name": "Trạm mô phỏng VinUni - Ocean Park",
+      "latitude": 20.9880,
+      "longitude": 105.9520,
+      "connectors": [
+        {"type": "CCS2", "power_kw": 150, "total": 8, "available": 5},
+        {"type": "Type 2", "power_kw": 11, "total": 4, "available": 2}
+      ],
+      "available_ports": 7,
+      "status": "operating",
+      "status_timestamp": "2026-09-12T09:00:00+07:00",
+      "simulated": true,
+      "source": null
+    },
+    {
+      "id": "SIM-HN-007",
+      "name": "Trạm mô phỏng Mỹ Đình - Lê Đức Thọ",
+      "latitude": 21.0210,
+      "longitude": 105.7640,
+      "connectors": [
+        {"type": "CCS2", "power_kw": 60, "total": 6, "available": 3},
+        {"type": "Type 2", "power_kw": 11, "total": 2, "available": 1}
+      ],
+      "available_ports": 4,
+      "status": "operating",
+      "status_timestamp": "2026-09-12T09:00:00+07:00",
+      "simulated": true,
+      "source": null
+    },
+    {
+      "id": "SIM-HN-008",
+      "name": "Trạm mô phỏng Hoàn Kiếm - Nhà Hát Lớn",
+      "latitude": 21.0250,
+      "longitude": 105.8560,
+      "connectors": [
+        {"type": "CCS2", "power_kw": 60, "total": 4, "available": 2}
+      ],
+      "available_ports": 2,
+      "status": "operating",
+      "status_timestamp": "2026-09-12T09:00:00+07:00",
+      "simulated": true,
+      "source": null
+    },
+    {
+      "id": "SIM-HN-009",
+      "name": "Trạm mô phỏng Sân bay Nội Bài - T1",
+      "latitude": 21.2185,
+      "longitude": 105.8040,
+      "connectors": [
+        {"type": "CCS2", "power_kw": 250, "total": 10, "available": 8}
+      ],
+      "available_ports": 8,
+      "status": "operating",
+      "status_timestamp": "2026-09-12T09:00:00+07:00",
+      "simulated": true,
+      "source": null
+    },
+    {
+      "id": "SIM-HN-010",
+      "name": "Trạm mô phỏng Hà Đông - Aeon Mall",
+      "latitude": 20.9810,
+      "longitude": 105.7530,
+      "connectors": [
+        {"type": "CCS2", "power_kw": 120, "total": 8, "available": 4},
+        {"type": "Type 2", "power_kw": 11, "total": 2, "available": 1}
+      ],
+      "available_ports": 5,
+      "status": "operating",
+      "status_timestamp": "2026-09-12T09:00:00+07:00",
+      "simulated": true,
+      "source": null
     }
   ]
 }
