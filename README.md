@@ -18,7 +18,7 @@ Mở terminal tại thư mục gốc của dự án (`VinUni_Day02-AI-Product-La
 *   **macOS / Linux:**
     ```bash
     python3 -m venv .venv
-    ```
+    ``` 
 
 ### 🔌 Bước 2: Kích hoạt (Activate) môi trường ảo
 Bạn phải kích hoạt môi trường ảo mỗi khi mở terminal mới trước khi chạy code.
