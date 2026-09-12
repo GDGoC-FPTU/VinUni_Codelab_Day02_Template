@@ -1,0 +1,43 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 538 >>
+stream
+BT
+/F1 16 Tf
+72 740 Td
+(Xanh SM - Current-State EV Battery Incident Workflow) Tj
+/F1 11 Tf
+0 -40 Td
+(1. Driver calls control room - 2 min) Tj
+0 -28 Td
+(HANDOFF: phone call to dispatcher) Tj
+0 -40 Td
+(2. Dispatcher searches vehicle GPS - 2 min) Tj
+0 -40 Td
+(3. Search station availability and connector - 5 min - BOTTLENECK) Tj
+0 -40 Td
+(4. Write directions and contact driver - 5 min - BOTTLENECK) Tj
+0 -40 Td
+(5. Escalate to mobile charger when required - 1 min) Tj
+0 -55 Td
+(Total estimated handling time: 15 minutes per incident) Tj
+0 -40 Td
+(Future control: battery below 5% and station over 5 km -> mobile charger) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+trailer
+<< /Root 1 0 R >>
+%%EOF
