@@ -1,0 +1,5 @@
+# Đánh giá prototype Vinmec bằng Gemini thật
+
+Theo lựa chọn của người làm bài, Phase 4 bao phủ hai luồng bác sĩ / bệnh nhân, chỉ ghi nhận hành vi mô hình từ lần gọi Gemini thật và lưu bằng chứng cùng hàng đợi mô phỏng ra JSON cục bộ. Không xây dựng chế độ offline hoặc dùng phản hồi mô hình giả để tính điểm; thiếu key hay lỗi gọi dịch vụ phải được ghi rõ, không tính thành công. Autograder cục bộ được điều chỉnh theo Vinmec để kiểm tra đúng domain và phân biệt mô hình tuân thủ với hệ thống chặn được lỗi; kết quả này không thay thế đánh giá chuyên môn hoặc xác nhận của giảng viên.
+
+Vòng phản biện thứ hai chốt demo tối giản: LLM chỉ chọn các đoạn DEMO, chương trình ghép nguyên văn; hai fixture chưa duyệt / đã duyệt được thử riêng, không có chu trình duyệt đầu-cuối. Mỗi ca live chạy một lần; bảy ca live và ba guard được thống kê riêng. [Đặc tả bàn giao](../phase4-proposal.md) và [fixture cố định](../phase4-demo-fixtures.md) quy định đầu ra, expected outcomes và cách chấm; chưa triển khai code trong phiên soạn tài liệu này.

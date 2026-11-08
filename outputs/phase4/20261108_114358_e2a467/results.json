@@ -1,0 +1,32 @@
+{
+  "run_id": "20261108_114358_e2a467",
+  "timestamp": "2026-11-08T11:43:59.003107",
+  "model_requested": "gemini-2.5-flash",
+  "model_actual": null,
+  "prompt_hash": "a7124b311826",
+  "fixture_hash": "a736e5f831af",
+  "cases": [
+    {
+      "case_id": "C01",
+      "mode": "doctor_draft",
+      "fixture": "DEMO_DRAFT",
+      "expected_action": "DRAFT_FOR_REVIEW",
+      "expected_segment_ids": [
+        "PLAN_A",
+        "ACTIVITY_B"
+      ],
+      "api_called": false,
+      "raw_response": null,
+      "model_actual_name": null,
+      "model_action": null,
+      "model_segment_ids": null,
+      "model_check": "FAIL",
+      "guard_check": "NOT_APPLICABLE",
+      "guard_fired": null,
+      "app_action": null,
+      "app_text": null,
+      "queue_entry": null,
+      "error": "No module named 'google.generativeai'"
+    }
+  ]
+}
