@@ -1,0 +1,120 @@
+# Báo cáo đi sâu: Xử lý khiếu nại khách hàng phức tạp của Xanh SM
+
+## 1. Bối cảnh và ranh giới bằng chứng
+
+**Vấn đề được chọn:** xử lý các khiếu nại phức tạp của khách hàng Xanh SM, gồm
+thất lạc đồ, sai giá cước và sự cố trong chuyến đi. Mục tiêu của báo cáo là
+đánh giá một trợ lý AI cho nhân viên hỗ trợ, không phải tự động hóa toàn bộ
+quyết định hoặc giao tiếp với khách hàng.
+
+Để tránh nhầm lẫn giữa dữ kiện và suy đoán, báo cáo dùng ba nhãn:
+
+- **Dữ kiện công khai:** thông tin có thể kiểm tra từ nguồn công khai hoặc
+  tài liệu nội bộ đã được dẫn trong [03-ai-log.md](03-ai-log.md). Nhật ký này
+  ghi nhận các tính năng Xanh SM được công bố và bối cảnh nghiên cứu; không có
+  số liệu công khai xác nhận quy trình khiếu nại hay năng suất dưới đây.
+- **Giả thuyết AI:** nhận định về cơ hội dùng AI, KPI và thiết kế vận hành,
+  cần được kiểm định bằng dữ liệu thực tế.
+- **Giả định pilot:** các con số minh họa trong báo cáo, gồm 15 phút mỗi ca,
+  100.000 chuyến/ngày và tỷ lệ khiếu nại 2%. Đây không phải số liệu nội bộ
+  Xanh SM đã được xác nhận.
+
+## 2. Quy trình hiện tại (Current-State Workflow)
+
+Quy trình dưới đây là **giả định pilot** để lập baseline và cần được đo lại
+trên dữ liệu nội bộ.
+
+| Bước | Tác nhân | Đầu vào | Hoạt động | Đầu ra | Bàn giao | Thời gian |
+|---|---|---|---|---|---|---:|
+| 1. Tiếp nhận và phân loại | Nhân viên hỗ trợ | Tin nhắn/cuộc gọi, mã chuyến nếu có | Ghi nhận, xác định nhóm thất lạc đồ, sai giá hoặc sự cố chuyến | Hồ sơ khiếu nại và nhãn ban đầu | Từ khách hàng sang nhân viên xử lý | 2 phút |
+| 2. Tra cứu hồ sơ | Nhân viên hỗ trợ | Hồ sơ và mã chuyến | Tìm bản ghi chuyến, giá cước, tài xế và liên hệ trước | Timeline và dữ kiện liên quan | Có thể yêu cầu bổ sung dữ liệu từ khách hàng | 5 phút — **điểm nghẽn** |
+| 3. Xác minh | Nhân viên hỗ trợ, tài xế hoặc nhóm chuyên trách | Timeline, câu hỏi xác minh | Liên hệ tài xế/nhóm chuyên trách để kiểm tra sự việc | Thông tin xác minh hoặc trạng thái chưa rõ | Hỗ trợ sang tài xế/nhóm chuyên trách rồi quay lại hỗ trợ | 4 phút — **điểm nghẽn/bàn giao** |
+| 4. Escalate và soạn trả lời | Nhân viên hỗ trợ, chuyên gia khi cần | Dữ kiện đã tra cứu và xác minh | Escalate ca cần thiết, soạn phản hồi cho khách | Bản nháp phản hồi và trạng thái xử lý | Sang chuyên gia/pháp chế nếu thuộc ca nhạy cảm | 3 phút |
+| 5. Theo dõi và đóng ca | Nhân viên hỗ trợ | Phản hồi được duyệt, kết quả xử lý | Theo dõi phản hồi, cập nhật hồ sơ và đóng ca | Ca hoàn tất hoặc được mở lại | Thông báo kết quả cho khách; mở lại nếu còn vấn đề | 1 phút |
+
+**Tổng thời gian giả định:** 15 phút mỗi ca (2 + 5 + 4 + 3 + 1). Thời gian
+thực tế, đặc biệt ở bước 2 và 3, cần được xác nhận bằng log hệ thống và
+phỏng vấn nhân viên.
+
+## 3. Problem Statement (đủ sáu trường)
+
+| Trường | Mô tả |
+|---|---|
+| **Actor / Operator** | Nhân viên hỗ trợ khách hàng Xanh SM; tài xế và nhóm chuyên trách tham gia xác minh hoặc escalation. |
+| **Current Workflow / Tools** | Nhân viên tiếp nhận khiếu nại, tra cứu nhiều bản ghi chuyến/giá cước/tài xế/liên hệ trước, liên hệ người liên quan, escalation khi cần, soạn phản hồi và đóng ca. Công cụ cụ thể và mức tích hợp hiện tại cần được kiểm kê nội bộ. |
+| **Bottleneck** | Tra cứu chéo hệ thống, tái dựng bối cảnh và chọn đúng tuyến xử lý chiếm nhiều thời gian; thông tin không đầy đủ có thể dẫn đến phản hồi không nhất quán. |
+| **Business Impact** | **Giả định pilot:** 100.000 chuyến/ngày × 2% khiếu nại = khoảng 2.000 ca/ngày. Với 15 phút/ca, tổng nỗ lực là 30.000 phút, tương đương **500 staff-hours/ngày**. Các con số này cần được Xanh SM xác thực, không phải số liệu công bố. |
+| **Success Metrics** | Giảm thời gian xử lý trung bình từ 15 xuống **dưới 8 phút**; định tuyến đúng ngay lần đầu **ít nhất 85%**; tỷ lệ mở lại **≤5%**; **0** lần gửi ra ngoài trái phép. Đây là mục tiêu giả thuyết để thử nghiệm. |
+| **Operational Boundary** | AI chỉ tóm tắt dữ liệu ca đã được cấp quyền, gợi ý danh mục/tuyến xử lý và soạn bản nháp. AI không được tự gửi, quyết định bồi thường, đóng ca nhạy cảm, truy cập dữ liệu trái phép, bịa dữ kiện hoặc thay thế chuyên gia/pháp chế. |
+
+## 4. AI Fit Matrix
+
+| Phương án | Mức phù hợp | Lý do |
+|---|---|---|
+| **LLM Feature — chọn** | Cao cho pilot có kiểm soát | Tóm tắt hồ sơ đã được phép truy cập, đề xuất phân loại/tuyến và soạn nháp giúp giảm thao tác lặp lại; nhân viên vẫn kiểm tra và quyết định. |
+| Autonomous Agent — loại | Không phù hợp ở giai đoạn này | Agent tự truy cập nhiều nguồn, liên hệ tài xế, escalation hoặc gửi kết quả có thể vượt quyền, làm lộ dữ liệu, bịa thông tin hoặc tự quyết định ca nhạy cảm. Luồng này đòi hỏi quyền hạn và kiểm soát chưa được xác nhận. |
+
+**Quyết định:** chọn **LLM Feature**, không chọn autonomous Agent. Đây là
+giả thuyết thiết kế, không phải khẳng định rằng hệ thống hiện tại đã sẵn sàng.
+
+## 5. Luồng tương lai (Future-State Flow)
+
+1. **Tiếp nhận và kiểm tra bằng rule:** kiểm tra quyền truy cập, mã ca/mã
+   chuyến và các trường bắt buộc. Nếu thiếu trường, không đủ quyền hoặc dữ
+   liệu không khả dụng, yêu cầu bổ sung hoặc chuyển sang quy trình thủ công.
+2. **LLM hỗ trợ:** trên phần dữ liệu đã được phép, tạo bản tóm tắt timeline,
+   gợi ý danh mục và tuyến xử lý, đồng thời soạn bản nháp phản hồi. Mọi
+   trường không có bằng chứng phải được đánh dấu là chưa xác minh.
+3. **Kiểm tra confidence/chất lượng:** nhân viên kiểm tra độ đầy đủ, nguồn
+   của dữ kiện, sự phù hợp của phân loại và chất lượng ngôn ngữ. Confidence
+   thấp, mâu thuẫn dữ liệu hoặc ca nhạy cảm thì chuyển ngay sang fallback.
+4. **HITL approval:** nhân viên có thẩm quyền duyệt/chỉnh bản nháp, quyết
+   định escalation và thực hiện các hành động được phép. Không có bước gửi
+   tự động.
+5. **Fallback thủ công:** dùng quy trình hiện tại khi thiếu dữ liệu, hệ
+   thống lỗi, confidence thấp, ca có rủi ro cao hoặc cần chuyên gia/pháp
+   chế. Kết quả pilot được ghi nhận để đánh giá, không dùng để tự động học
+   trực tiếp trong lúc xử lý ca.
+
+### Loại trừ rõ ràng
+
+- Không tự động gửi bất kỳ tin nhắn nào cho khách hàng hoặc tài xế.
+- Không tự quyết định hay chi trả bồi thường.
+- Không tự đóng ca nhạy cảm, tranh chấp nghiêm trọng hoặc vấn đề pháp lý.
+- Không truy cập dữ liệu ngoài quyền được cấp.
+- Không bịa, suy diễn hoặc trình bày dữ kiện chưa xác minh như sự thật.
+- Không thay thế chuyên gia vận hành, nhóm xử lý chuyên biệt hoặc rà soát
+  pháp chế.
+
+## 6. Checklist sẵn sàng cho AI
+
+- [ ] Có mẫu ca khiếu nại đã ẩn danh và được phê duyệt quyền sử dụng.
+- [ ] Có baseline thời gian xử lý thực tế, tách theo loại ca.
+- [ ] Có nhãn định tuyến đúng và tiêu chí chất lượng phản hồi.
+- [ ] Đã kiểm kê nguồn dữ liệu, quyền truy cập và trường bắt buộc.
+- [ ] Có người chịu trách nhiệm HITL, escalation và rà soát pháp chế.
+- [ ] Có log audit cho đầu vào, bản nháp, chỉnh sửa, phê duyệt và fallback.
+- [ ] Có tiêu chí đo hallucination, rò rỉ dữ liệu, gửi trái phép và mở lại ca.
+- [ ] Đã thống nhất ngưỡng confidence và điều kiện dừng pilot.
+
+## 7. Quyết định: NOT YET
+
+**NOT YET** — chưa triển khai vào luồng sản xuất. Hiện còn thiếu mẫu ca ẩn
+danh, baseline thời gian, nhãn định tuyến, tiêu chí chất lượng và phê duyệt
+của các bên liên quan; các metric và giả định trong báo cáo cũng cần được
+kiểm chứng bằng dữ liệu nội bộ.
+
+Bước tiếp theo được khuyến nghị là **pilot shadow-mode**: LLM chỉ tạo tóm
+tắt, phân loại và bản nháp song song với quy trình hiện tại; nhân viên không
+nhìn thấy hoặc không dùng đầu ra để tự động gửi, bồi thường hay đóng ca.
+Đánh giá sau pilot dựa trên thời gian, độ chính xác định tuyến, tỷ lệ mở lại,
+vi phạm quyền truy cập và chất lượng bản nháp. Chỉ xem xét mở rộng sau khi
+đạt ngưỡng đã được phê duyệt và qua rà soát an toàn.
+
+## 8. Ghi chú nguồn và nghiên cứu
+
+Nhật ký nghiên cứu [03-ai-log.md](03-ai-log.md) là nguồn tham chiếu cho các
+fact công khai và ghi lại cách phân biệt nguồn với giả thuyết AI. Nhật ký
+không xác nhận quy trình hỗ trợ, 15 phút, 100.000 chuyến/ngày, 2% khiếu nại,
+500 staff-hours/ngày hay các KPI nêu trên. **Tất cả metric vận hành nội bộ
+cần được Xanh SM xác thực trước khi dùng làm baseline hoặc claim về tác động.**
