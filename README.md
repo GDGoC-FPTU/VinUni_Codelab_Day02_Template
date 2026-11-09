@@ -1,5 +1,87 @@
 # 📖 Hướng Dẫn Học Viên (Student Guide) — Lab 02: AI Product Scoping
 
+## Bài làm trong repository này
+
+Đề tài: **trợ lý soạn nháp xử lý sự cố pin Xanh SM**, dùng dữ liệu mô phỏng.
+
+- [Scan và 3 cards](01-problem-scan.md)
+- [Báo cáo phân tích sâu](02-deep-dive-report.md)
+- [Nhật ký AI và trạng thái kiểm chứng](03-ai-log.md)
+- [Sơ đồ quy trình hiện tại](04-workflow-diagram.pdf)
+
+### Chạy trên Ubuntu 24.04 với conda
+
+Môi trường trên máy có tên **`AI20k`** (chữ `k` thường). Yêu cầu Python **3.10 trở lên**. Tại thư mục gốc project:
+
+```bash
+conda activate AI20k
+python -m pip install -r requirements.txt
+```
+
+Nhập khóa kín trong terminal của bạn, không lưu vào code hay chat:
+
+```bash
+read -rsp 'Gemini API key: ' GEMINI_API_KEY
+printf '\n'
+export GEMINI_API_KEY
+python starter-code/prompt_prototype.py
+```
+
+`read -s` không hiển thị khóa và không đưa giá trị khóa vào lịch sử lệnh. Script nhận biến từ **cùng terminal**; không cần lưu khóa bằng `conda env config vars set`. Nếu bạn đã `export GEMINI_API_KEY` trước đó thì chỉ cần chạy lệnh Python. Sau khi dùng xong có thể xóa biến trong terminal bằng `unset GEMINI_API_KEY`. Phần hướng dẫn Windows ở dưới là tài liệu gốc của template, không áp dụng cho môi trường Ubuntu này.
+
+Code không in nguyên văn ngoại lệ SDK và che giá trị khóa đã cấu hình nếu nó xuất hiện trong phản hồi được in ra. Khóa chỉ được truyền cho SDK để xác thực, không đưa vào system prompt hoặc nội dung người dùng.
+
+Khi lỗi API, script chỉ in mã HTTP, trạng thái và mã nguyên nhân thuộc danh sách cho phép, kèm hướng dẫn cục bộ. Không in URL, nội dung ngoại lệ hoặc metadata của SDK. Nếu cần chẩn đoán, chỉ chia sẻ dòng `Failed` mới; không chia sẻ khóa hoặc dump môi trường. Tham khảo [hướng dẫn lỗi API của Google](https://ai.google.dev/gemini-api/docs/generate-content/api-errors).
+
+Kiểm tra cục bộ, không gọi API:
+
+```bash
+python tools/check_submission.py
+```
+
+Kiểm tra toàn bộ, gồm autograder gọi Gemini thật, trong cùng terminal đã export khóa:
+
+```bash
+python tools/check_submission.py --live
+```
+
+Kết quả được lưu tại `artifacts/submission-check.json`, gồm mã thoát và thời gian từng kiểm tra, không chứa khóa hoặc dump môi trường. Thư mục `artifacts/` được bỏ qua khi đưa lên Git. Chế độ mặc định không gọi API, kể cả khi môi trường đã có khóa; kết quả offline không được ghi là autograder live đã đạt.
+
+Chạy mô hình thật sau khi đặt `GEMINI_API_KEY` hoặc `GOOGLE_API_KEY` theo hướng dẫn bên dưới:
+
+```bash
+python starter-code/prompt_prototype.py
+```
+
+Script trả mã lỗi khác 0 khi thiếu khóa hoặc có kiểm tra thất bại. Kết quả `Passed` chỉ xác nhận cấu trúc và hành động kỳ vọng; cần người đọc lại nội dung. Người dùng đã chạy với `gemini-3.5-flash-lite`: ban đầu **3/4**, sau sửa prompt đạt **6/6**, gồm 4 ca cũ và 2 biến thể. Lệnh kiểm tra tổng hợp `--live` sau đó đạt **50 tests** và **autograder 10/10**; bước autograder đầy đủ chạy trong **7,447 giây**, không vượt timeout gốc 30 giây trong lượt này. Chi tiết trong nhật ký AI. Điểm autograder không thay thế điểm nội dung theo rubric môn học và không chứng minh an toàn vận hành thực tế.
+
+Nếu nhận `HTTP 404; NOT_FOUND`, dùng chính terminal đã cấp khóa để liệt kê model:
+
+```bash
+python starter-code/prompt_prototype.py --list-models
+```
+
+Lệnh này chỉ gọi danh sách model, không chạy các ca sinh nội dung. Chọn một model văn bản Flash hỗ trợ `generateContent` trong danh sách, rồi thay `TEN_MODEL_TU_DANH_SACH` dưới đây bằng tên thật:
+
+```bash
+export GEMINI_MODEL='TEN_MODEL_TU_DANH_SACH'
+python starter-code/prompt_prototype.py
+```
+
+**Model mặc định của bài hoàn thiện là `gemini-3.5-flash-lite`**, đã được người dùng chạy đạt 6/6; không cần export `GEMINI_MODEL` để chọn nó. Template ban đầu dùng `gemini-2.5-flash`, nhưng model này trả 404 với project của người dùng. Biến `GEMINI_MODEL` vẫn được ưu tiên nếu đã đặt; nếu terminal còn cấu hình model cũ, dùng `unset GEMINI_MODEL` để quay về mặc định mới. Không tự fallback sang model khác khi lỗi. Khi nộp cần nêu thay đổi model này vì khác chỉ định trong đề gốc. Tham khảo [vòng đời model của Google](https://ai.google.dev/gemini-api/docs/deprecations).
+
+Tạo lại sơ đồ (Pillow, font Unicode; có thể đặt `WORKFLOW_FONT` tới file `.ttf`):
+
+```bash
+python tools/generate_workflow.py
+```
+
+Các file `.py` hoàn thiện và kiểm thử chỉ nộp ở branch cá nhân. Nhóm chọn tài liệu và PDF để đưa vào `main`; không merge code hoàn thiện vào `main`.
+
+Xem [hướng dẫn chốt và nộp bài](06-huong-dan-nop-bai.md) để biết trạng thái kiểm chứng, cách commit chọn lọc và phần cần trưởng nhóm thực hiện.
+
+---
+
 Tài liệu này hướng dẫn chi tiết cách thiết lập môi trường lập trình Python, cấu hình API Key, quy trình phân nhánh Git làm việc nhóm và chuẩn bị sản phẩm nộp bài cho **Lab 02: AI Product Scoping (Vin Smart Future)**.
 
 ---
