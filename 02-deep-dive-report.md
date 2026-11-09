@@ -45,7 +45,7 @@ phỏng vấn nhân viên.
 | **Bottleneck** | Tra cứu chéo hệ thống, tái dựng bối cảnh và chọn đúng tuyến xử lý chiếm nhiều thời gian; thông tin không đầy đủ có thể dẫn đến phản hồi không nhất quán. |
 | **Business Impact** | **Giả định pilot:** 100.000 chuyến/ngày × 2% khiếu nại = khoảng 2.000 ca/ngày. Với 15 phút/ca, tổng nỗ lực là 30.000 phút, tương đương **500 staff-hours/ngày**. Các con số này cần được Xanh SM xác thực, không phải số liệu công bố. |
 | **Success Metrics** | Giảm thời gian xử lý trung bình từ 15 xuống **dưới 8 phút**; định tuyến đúng ngay lần đầu **ít nhất 85%**; tỷ lệ mở lại **≤5%**; **0** lần gửi ra ngoài trái phép. Đây là mục tiêu giả thuyết để thử nghiệm. |
-| **Operational Boundary** | AI chỉ tóm tắt dữ liệu ca đã được cấp quyền, gợi ý danh mục/tuyến xử lý và soạn bản nháp. AI không được tự gửi, quyết định bồi thường, đóng ca nhạy cảm, truy cập dữ liệu trái phép, bịa dữ kiện hoặc thay thế chuyên gia/pháp chế. |
+| **Operational Boundary** | AI chỉ tóm tắt dữ liệu ca đã được cấp quyền, gợi ý danh mục/tuyến xử lý và soạn bản nháp trong môi trường/provider triển khai đã được phê duyệt. Trước khi xử lý, phải tối thiểu hóa và che/ẩn PII của khách hàng, tài xế; áp dụng kiểm soát truy cập, lưu giữ và xóa dữ liệu đã phê duyệt. Không được gửi dữ liệu khách hàng chưa được phê duyệt ra ngoài môi trường được ủy quyền. AI không được tự gửi, quyết định bồi thường, đóng ca nhạy cảm, truy cập dữ liệu trái phép, bịa dữ kiện hoặc thay thế chuyên gia/pháp chế. |
 
 ## 4. AI Fit Matrix
 
@@ -62,9 +62,12 @@ giả thuyết thiết kế, không phải khẳng định rằng hệ thống h
 1. **Tiếp nhận và kiểm tra bằng rule:** kiểm tra quyền truy cập, mã ca/mã
    chuyến và các trường bắt buộc. Nếu thiếu trường, không đủ quyền hoặc dữ
    liệu không khả dụng, yêu cầu bổ sung hoặc chuyển sang quy trình thủ công.
-2. **LLM hỗ trợ:** trên phần dữ liệu đã được phép, tạo bản tóm tắt timeline,
+2. **LLM hỗ trợ:** chỉ trong deployment/provider đã được phê duyệt và trên
+   phần dữ liệu đã được tối thiểu hóa, che/ẩn PII, tạo bản tóm tắt timeline,
    gợi ý danh mục và tuyến xử lý, đồng thời soạn bản nháp phản hồi. Mọi
-   trường không có bằng chứng phải được đánh dấu là chưa xác minh.
+   trường không có bằng chứng phải được đánh dấu là chưa xác minh. Không
+   chuyển dữ liệu khách hàng chưa được phê duyệt ra ngoài môi trường được
+   ủy quyền.
 3. **Kiểm tra confidence/chất lượng:** nhân viên kiểm tra độ đầy đủ, nguồn
    của dữ kiện, sự phù hợp của phân loại và chất lượng ngôn ngữ. Confidence
    thấp, mâu thuẫn dữ liệu hoặc ca nhạy cảm thì chuyển ngay sang fallback.
@@ -82,6 +85,11 @@ giả thuyết thiết kế, không phải khẳng định rằng hệ thống h
 - Không tự quyết định hay chi trả bồi thường.
 - Không tự đóng ca nhạy cảm, tranh chấp nghiêm trọng hoặc vấn đề pháp lý.
 - Không truy cập dữ liệu ngoài quyền được cấp.
+- Chỉ dùng deployment/provider đã được phê duyệt; phải tối thiểu hóa và
+  che/ẩn PII khách hàng, tài xế trước khi xử lý.
+- Phải có kiểm soát truy cập theo vai trò, thời hạn lưu giữ/xóa dữ liệu và
+  audit log; không gửi dữ liệu khách hàng chưa được phê duyệt ra ngoài môi
+  trường được ủy quyền.
 - Không bịa, suy diễn hoặc trình bày dữ kiện chưa xác minh như sự thật.
 - Không thay thế chuyên gia vận hành, nhóm xử lý chuyên biệt hoặc rà soát
   pháp chế.
@@ -92,6 +100,8 @@ giả thuyết thiết kế, không phải khẳng định rằng hệ thống h
 - [ ] Có baseline thời gian xử lý thực tế, tách theo loại ca.
 - [ ] Có nhãn định tuyến đúng và tiêu chí chất lượng phản hồi.
 - [ ] Đã kiểm kê nguồn dữ liệu, quyền truy cập và trường bắt buộc.
+- [ ] Đã phê duyệt deployment/provider, quy tắc tối thiểu hóa/che PII, thời
+      hạn lưu giữ/xóa và kiểm soát truy cập.
 - [ ] Có người chịu trách nhiệm HITL, escalation và rà soát pháp chế.
 - [ ] Có log audit cho đầu vào, bản nháp, chỉnh sửa, phê duyệt và fallback.
 - [ ] Có tiêu chí đo hallucination, rò rỉ dữ liệu, gửi trái phép và mở lại ca.
@@ -107,9 +117,13 @@ kiểm chứng bằng dữ liệu nội bộ.
 Bước tiếp theo được khuyến nghị là **pilot shadow-mode**: LLM chỉ tạo tóm
 tắt, phân loại và bản nháp song song với quy trình hiện tại; nhân viên không
 nhìn thấy hoặc không dùng đầu ra để tự động gửi, bồi thường hay đóng ca.
-Đánh giá sau pilot dựa trên thời gian, độ chính xác định tuyến, tỷ lệ mở lại,
-vi phạm quyền truy cập và chất lượng bản nháp. Chỉ xem xét mở rộng sau khi
-đạt ngưỡng đã được phê duyệt và qua rà soát an toàn.
+Ở shadow mode, chỉ đo các chỉ số offline: độ chính xác định tuyến, mức bao
+phủ trường bắt buộc, độ đúng/sát dữ kiện và chất lượng bản nháp qua rà soát,
+cùng latency. **Thời gian xử lý, tỷ lệ mở lại và định tuyến trực tiếp không
+thuộc shadow mode**; các chỉ số này chỉ đo ở giai đoạn sau, là
+**HITL assisted pilot**, khi đầu ra được nhân viên có thẩm quyền sử dụng và
+duyệt trong quy trình thật. Chỉ xem xét chuyển giai đoạn sau khi đạt ngưỡng
+đã được phê duyệt và qua rà soát an toàn.
 
 ## 8. Ghi chú nguồn và nghiên cứu
 
