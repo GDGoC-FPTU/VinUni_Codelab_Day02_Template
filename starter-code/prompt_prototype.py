@@ -12,10 +12,90 @@ Instructions:
 
 import os
 import sys
+import time
+from pathlib import Path
 from typing import Any
+from dotenv import load_dotenv
+from google import genai
+from google.genai import types
+
+# Load API keys from keys.env located in the same folder as this file.
+# override=False: keys already set in the real environment take precedence.
+load_dotenv(Path(__file__).resolve().parent / "keys.env", override=False)
 
 # Standard Model Identifier
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-3.8-flash"
+
+# Gemini call fucntion(from minilab 1)
+def call_gemini(
+    prompt: str,
+    model: str = GEMINI_MODEL,
+    temperature: float = 0.4,
+    top_p: float = 0.9,
+    max_tokens: int = 1024,
+) -> tuple[str, float, dict]:
+    """
+    Call the Google Gemini API (using Gemini 2.5 Flash as standard) and return
+    the response text, latency, and token usage stats.
+
+    Args:
+        prompt:      The user message to send.
+        model:       The Gemini model to use (default: gemini-2.5-flash).
+        temperature: Sampling temperature.
+        top_p:       Nucleus sampling threshold.
+        max_tokens:  Maximum number of tokens to generate.
+
+    Returns:
+        A tuple of:
+            - response_text (str)
+            - latency_seconds (float)
+            - usage (dict with keys: 'input_tokens', 'output_tokens')
+
+    Hint:
+        Option A (New Google GenAI SDK):
+            from google import genai
+            from google.genai import types
+            client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+            # Configure using types.GenerateContentConfig
+            
+        Option B (Legacy Google GenerativeAI SDK):
+            import google.generativeai as genai
+            genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+            model_inst = genai.GenerativeModel(model)
+            # Configure using genai.types.GenerationConfig
+            
+        Ensure your usage dictionary extracts 'input_tokens' and 'output_tokens' 
+        from the response metadata (e.g. response.usage_metadata).
+    """
+    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+    config_kwargs = dict(
+        temperature=temperature,
+        top_p=top_p,
+        max_output_tokens=max_tokens,
+    )
+    # Gemini 2.5 "thinking" tokens count against max_output_tokens; with a small
+    # budget the answer can come back empty. Flash models allow disabling it.
+    if "flash" in model:
+        config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
+    config = types.GenerateContentConfig(**config_kwargs)
+
+    start_time = time.time()
+    response = client.models.generate_content(
+        model=model,
+        contents=prompt,
+        config=config,
+    )
+    end_time = time.time()
+    latency_seconds = end_time - start_time
+
+    response_text = response.text or ""
+    meta = response.usage_metadata
+    usage = {
+        "input_tokens": response.usage_metadata.prompt_token_count,
+        "output_tokens": response.usage_metadata.candidates_token_count
+    }
+    return (response_text, latency_seconds, usage)
+
 
 # ===========================================================================
 # 🛡️ Operational Boundaries to Enforce via System Prompt:
@@ -47,7 +127,15 @@ def evaluate_prompt(user_input: str) -> str:
     # TODO: Initialize Gemini client and call model.generate_content
     #       Pass the SYSTEM_PROMPT as a system instruction (or prepend to the content).
     #       Return the model's response text.
-    raise NotImplementedError("Implement evaluate_prompt")
+    output = call_gemini(
+        prompt=f"{SYSTEM_PROMPT}\n\nUser Input: {user_input}",
+        model=GEMINI_MODEL,
+        temperature=0.4,
+        top_p=0.9,
+        max_tokens=1024
+    )
+    return output[0]  # Return only the response text
+    #raise NotImplementedError("Implement evaluate_prompt")
 
 
 # ===========================================================================
