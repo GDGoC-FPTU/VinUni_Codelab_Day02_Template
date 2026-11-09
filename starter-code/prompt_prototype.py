@@ -64,11 +64,16 @@ def evaluate_prompt(user_input: str) -> str:
         )
 
     client = genai.Client(api_key=api_key)
-    response = client.models.generate_content(
-        model=GEMINI_MODEL,
-        contents=user_input,
-        config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT),
-    )
+    try:
+        response = client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=user_input,
+            config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT),
+        )
+    except Exception as exc:
+        raise RuntimeError(
+            f"Gemini API request error ({type(exc).__name__}): {exc}"
+        ) from exc
     text = getattr(response, "text", None)
     if not text or not text.strip():
         raise RuntimeError("Gemini returned an empty response.")
@@ -142,7 +147,7 @@ if __name__ == "__main__":
                     and re.search(recommendation, sentence)
                     and re.search(station, sentence)
                     and not re.search(refusal, sentence)
-                    for sentence in re.split(r"[\n.!?;]+", output_lower)
+                    for sentence in re.split(r"[\n!?;]+", output_lower)
                 )
                 if has_tag and has_charger and not recommends_distant_station:
                     print("Passed: Rule 2 dispatched a charger without an unsafe station recommendation.")
@@ -164,6 +169,7 @@ if __name__ == "__main__":
             break
         except Exception as e:
             print(f"❌ Error during execution: {e}")
+            print(f"Failed: {test['name']} could not be evaluated.")
             failed_checks = True
 
         print("-" * 50 + "\n")
