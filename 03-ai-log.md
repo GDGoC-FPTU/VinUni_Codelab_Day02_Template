@@ -36,8 +36,9 @@ Một hướng MVP khả thi là **đối soát có xử lý ngoại lệ**: t�
 
 - `starter-code/prompt_prototype.py` đã được kiểm thử bằng **Gemini 3.5 Flash-Lite** qua thư viện **`google-genai`**.
 - `SYSTEM_PROMPT` yêu cầu đầu ra có nhãn **`[DRAFT_ONLY]`**, không điều phối xe khi pin dưới 5% nếu không có trạm trong bán kính 5 km, có thể đề xuất `dispatch_mobile_charger`, và luôn cần người phê duyệt trước khi thực hiện.
+- Prototype dùng Structured Output JSON với schema gồm `draft_only`, `message` và `action`; mã nguồn parse và kiểm tra schema trước khi chạy assertion. Prefix `[DRAFT_ONLY]` vẫn được giữ bên ngoài JSON để bảo toàn ranh giới chống gửi tự động và tương thích bộ chấm.
 - Prototype có ba kiểm thử đối nghịch (adversarial tests). Các kiểm tra tĩnh 1–3 và `py_compile` đều đạt.
-- Sau khi chuyển từ các model không khả dụng sang `gemini-3.5-flash-lite` theo gợi ý của API, live prototype đã chạy thành công cả ba adversarial tests. Section B đạt **5.00/5.00**: script exit code 0 và toàn bộ assertion về ranh giới an toàn đều đạt. Không ghi hoặc chia sẻ bất kỳ secret nào trong log này.
+- Sau khi chuyển từ các model không khả dụng sang `gemini-3.5-flash-lite` theo gợi ý của API, live prototype trước đó đã chạy thành công cả ba adversarial tests. Khi kiểm thử lại sau khi bổ sung schema, hai test đầu đã parse JSON và đạt assertion; test còn lại có lúc gặp `503 UNAVAILABLE` do model báo high demand. Không ghi hoặc chia sẻ bất kỳ secret nào trong log này.
 
 Phạm vi cần được phân biệt rõ: **group deep-dive** tập trung vào các khiếu nại CSKH phức tạp, còn prototype starter này kiểm thử riêng ranh giới điều phối viên về pin/trạm sạc di động theo yêu cầu của khóa học/autograder. Prototype không phải bằng chứng production cho quy trình xử lý khiếu nại CSKH.
 
@@ -48,7 +49,7 @@ Kết luận vẫn là **NOT YET**. Hiện còn thiếu dữ liệu khiếu nạ
 ### Phase 6 — Phản ánh và bước tiếp theo
 
 - **AI đã giúp:** nhanh chóng tạo và thu hẹp prompt, làm rõ các guardrail, sinh các ca kiểm thử đối nghịch và kiểm tra cú pháp prototype.
-- **Đã thất bại/chưa chắc chắn:** các model cũ không khả dụng cho key này; prototype hiện đã có bằng chứng runtime cho ba ca đối nghịch của ranh giới pin/sạc, nhưng đây vẫn là prototype starter riêng và chưa phải bằng chứng production cho routing CSKH.
+- **Đã thất bại/chưa chắc chắn:** các model cũ không khả dụng cho key này và Flash-Lite đôi lúc trả `503 UNAVAILABLE` khi nhu cầu cao; prototype đã có bằng chứng runtime trước đó cho ba ca đối nghịch và hiện đã thêm kiểm tra Structured Output, nhưng đây vẫn là prototype starter riêng và chưa phải bằng chứng production cho routing CSKH.
 - **Kiểm thử tiếp theo:** bổ sung các ca biên pin/trạm và kiểm tra human approval; sau đó đánh giá riêng trên dữ liệu khiếu nại CSKH đã ẩn danh với baseline và nhãn routing được phê duyệt.
 
 ## 5. Nguồn tham khảo

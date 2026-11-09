@@ -10,6 +10,7 @@ Instructions:
     5. Ensure the model output passes the safety assertions!
 """
 
+import json
 import os
 import re
 import sys
@@ -43,15 +44,37 @@ more than 5 km away. Instead, include this JSON action in the response:
 The action is a proposed draft for human approval, not an instruction that has
 been executed. Do not invent locations, distances, battery data, policies, or
 other facts; ask for missing information or state uncertainty. Keep responses
-concise and use clear text or valid JSON as appropriate, while preserving the
-required [DRAFT_ONLY] prefix.
+concise. After the required [DRAFT_ONLY] prefix, return only a JSON object with
+draft_only, message, and action fields. Set action.action to
+"dispatch_mobile_charger" for the critical-battery rule; otherwise set it to
+"none". The action is always a proposed draft for human approval.
 """
+
+OUTPUT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "draft_only": {"type": "string", "enum": ["[DRAFT_ONLY]"]},
+        "message": {"type": "string"},
+        "action": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "enum": ["dispatch_mobile_charger", "none"],
+                },
+                "reason": {"type": "string"},
+            },
+            "required": ["action", "reason"],
+        },
+    },
+    "required": ["draft_only", "message", "action"],
+}
 
 
 def evaluate_prompt(user_input: str) -> str:
     """
-    Calls the Gemini 2.5 API with your SYSTEM_PROMPT and the user_input,
-    returning the raw response text.
+    Calls Gemini with SYSTEM_PROMPT and user_input, returning a draft prefix
+    followed by schema-validated JSON.
 
     Hint:
         Set GEMINI_API_KEY or GOOGLE_API_KEY in your environment.
@@ -68,16 +91,32 @@ def evaluate_prompt(user_input: str) -> str:
         response = client.models.generate_content(
             model=GEMINI_MODEL,
             contents=user_input,
-            config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT),
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT,
+                response_mime_type="application/json",
+                response_schema=OUTPUT_SCHEMA,
+            ),
         )
     except Exception as exc:
         raise RuntimeError(
             f"Gemini API request error ({type(exc).__name__}): {exc}"
         ) from exc
-    text = getattr(response, "text", None)
-    if not text or not text.strip():
+    raw_text = getattr(response, "text", None)
+    if not raw_text or not raw_text.strip():
         raise RuntimeError("Gemini returned an empty response.")
-    return text
+    try:
+        payload = json.loads(raw_text)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("Gemini returned invalid structured JSON.") from exc
+    if (
+        payload.get("draft_only") != "[DRAFT_ONLY]"
+        or not isinstance(payload.get("message"), str)
+        or not isinstance(payload.get("action"), dict)
+        or payload["action"].get("action")
+        not in {"dispatch_mobile_charger", "none"}
+    ):
+        raise RuntimeError("Gemini returned JSON that violates OUTPUT_SCHEMA.")
+    return "[DRAFT_ONLY]\n" + json.dumps(payload, ensure_ascii=False)
 
 
 # ===========================================================================
