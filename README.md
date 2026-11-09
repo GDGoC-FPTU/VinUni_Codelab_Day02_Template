@@ -1,5 +1,29 @@
 # 📖 Hướng Dẫn Học Viên (Student Guide) — Lab 02: AI Product Scoping
 
+## Bài cá nhân Vinhomes — Lê Việt Khoa
+
+Xem [đánh giá và checklist bài cá nhân](05-individual-review.md),
+[Scan & 3 Cards](01-problem-scan.md), [Deep Dive](02-deep-dive-report.md),
+[AI Log](03-ai-log.md) và [sơ đồ workflow](04-workflow-diagram.png).
+Nội dung mới kế thừa báo cáo Word Phase 1–2, các số liệu vẫn là giả định.
+
+Kiểm tra code không cần API key:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q tests
+```
+
+Chạy 3 ca tấn công và 6 ca đối chứng qua OpenRouter (cần `OPENROUTER_API_KEY`):
+
+```powershell
+.\.venv\Scripts\python.exe starter-code/prompt_prototype.py --suite all --report evidence/live-results.json
+```
+
+Xem [bằng chứng kiểm tra](evidence/verification.md). Unit test dùng phản hồi giả lập;
+không thay thế chứng cứ chạy API thật. Bộ chấm gốc vẫn có các tiêu chí riêng cho Gemini/Xanh SM.
+
+---
+
 Tài liệu này hướng dẫn chi tiết cách thiết lập môi trường lập trình Python, cấu hình API Key, quy trình phân nhánh Git làm việc nhóm và chuẩn bị sản phẩm nộp bài cho **Lab 02: AI Product Scoping (Vin Smart Future)**.
 
 ---
@@ -39,42 +63,41 @@ Bạn phải kích hoạt môi trường ảo mỗi khi mở terminal mới trư
 *   **Dấu hiệu kích hoạt thành công:** Ở đầu dòng lệnh của terminal xuất hiện ký hiệu `(.venv)`.
 
 ### 📥 Bước 3: Cài đặt thư viện cần thiết
-Phiên bản `starter-code/prompt_prototype.py` hiện dùng **Groq API**. Cài thư viện một lần trong `.venv` của dự án:
+Phiên bản `starter-code/prompt_prototype.py` dùng **OpenRouter API**, mặc định gọi **Gemini 2.5 Flash**. Cài thư viện một lần trong `.venv` của dự án:
 ```bash
 python -m pip install -r requirements.txt
 ```
 
-Không cần tạo lại `.venv` hoặc cài lại thư viện mỗi lần chạy. Các thư viện Gemini đã cài trước đó không cần thiết cho bản Groq; lệnh trên không tự gỡ chúng.
+Không cần tạo lại `.venv` hoặc cài lại thư viện mỗi lần chạy. Code dùng `httpx` gọi HTTP trực tiếp; không cần SDK Groq hay Google. Lệnh trên không tự gỡ thư viện cũ.
 
 ---
 
-## 🔑 2. Thiết lập và sử dụng Groq API
+## 🔑 2. Thiết lập và sử dụng OpenRouter API
 
 ### Tạo API key (lần đầu)
 
-1. Đăng nhập [Groq Console](https://console.groq.com/).
-2. Mở [API Keys](https://console.groq.com/keys), chọn **Create API Key** và sao chép key.
+1. Đăng nhập [OpenRouter](https://openrouter.ai/).
+2. Mở [API Keys của workspace](https://openrouter.ai/workspaces/default/keys), tạo API key và sao chép giá trị key.
 3. Đặt key trong terminal như bên dưới. **Không ghi key vào file Python, README hoặc commit lên Git.**
 
-Groq có Free Plan với giới hạn lượt gọi/token theo model và tài khoản. Kiểm tra [Limits](https://console.groq.com/settings/limits) của tài khoản; không cần chuyển sang Developer Plan để thử trong hạn mức miễn phí. Xem [tài liệu hạn mức](https://console.groq.com/docs/rate-limits).
+Model mặc định `google/gemini-2.5-flash` có tính phí; kiểm tra số dư và hạn mức key trong tài khoản trước khi chạy. Xem [trang model](https://openrouter.ai/google/gemini-2.5-flash) và [tài liệu lỗi, gồm lỗi thiếu credit](https://openrouter.ai/docs/api/reference/errors-and-debugging). Không tự đổi sang model khác khi hết credit.
 
 ### Chạy trên Windows PowerShell
 
-Mở terminal tại thư mục gốc của dự án, thay `KEY_GROQ_CUA_BAN` bằng key vừa tạo:
+Mở terminal tại thư mục gốc của dự án, thay `KEY_OPENROUTER_CUA_BAN` bằng key vừa tạo:
 
 ```powershell
-.\.venv\Scripts\Activate.ps1
-$env:GROQ_API_KEY="KEY_GROQ_CUA_BAN"
-python starter-code/prompt_prototype.py
+$env:OPENROUTER_API_KEY="KEY_OPENROUTER_CUA_BAN"
+.\.venv\Scripts\python.exe starter-code/prompt_prototype.py --suite all --report evidence/live-results.json
 ```
 
-Nếu terminal đã có `(.venv)` thì bỏ qua dòng kích hoạt. Biến `$env:GROQ_API_KEY` chỉ áp dụng cho terminal hiện tại và các tiến trình con; khi mở terminal mới, kích hoạt lại môi trường và đặt lại key. Các biến `GEMINI_API_KEY`/`GOOGLE_API_KEY` cũ không được bản Groq sử dụng.
+Lệnh trên dùng Python trong `.venv` trực tiếp nên không cần activate. Biến `$env:OPENROUTER_API_KEY` chỉ áp dụng cho terminal hiện tại và các tiến trình con. Các biến `GROQ_API_KEY`, `GEMINI_API_KEY`, `GOOGLE_API_KEY` không được dùng. Không tự đọc `.env`.
 
 Trên CMD:
 
 ```cmd
 .venv\Scripts\activate.bat
-set GROQ_API_KEY=KEY_GROQ_CUA_BAN
+set OPENROUTER_API_KEY=KEY_OPENROUTER_CUA_BAN
 python starter-code/prompt_prototype.py
 ```
 
@@ -82,22 +105,22 @@ Trên macOS/Linux:
 
 ```bash
 source .venv/bin/activate
-export GROQ_API_KEY="KEY_GROQ_CUA_BAN"
+export OPENROUTER_API_KEY="KEY_OPENROUTER_CUA_BAN"
 python starter-code/prompt_prototype.py
 ```
 
 Kiểm tra biến môi trường đã có giá trị mà không in key:
 
 ```bash
-python -c "import os; print('API Key status: OK' if os.getenv('GROQ_API_KEY') else 'API Key status: MISSING')"
+python -c "import os; print('API Key status: OK' if os.getenv('OPENROUTER_API_KEY') else 'API Key status: MISSING')"
 ```
 
 `OK` chỉ xác nhận có giá trị, chưa xác nhận key hợp lệ hoặc có quyền gọi API.
 
 ### Model, prompt và kết quả
 
-- Model mặc định là `openai/gpt-oss-20b`, được gọi **qua Groq** bằng key Groq; không cần key OpenAI. Tham khảo [model được hỗ trợ](https://console.groq.com/docs/models).
-- Nếu cần đổi model được tài khoản cấp quyền, đặt `$env:GROQ_MODEL="TEN_MODEL_TREN_GROQ"` trước khi chạy. Không dùng tên model Gemini.
+- Model mặc định là `google/gemini-2.5-flash`, khớp tên model trong worksheet, được gọi **qua OpenRouter** bằng key OpenRouter. Không cần key Google. Tham khảo [trang model](https://openrouter.ai/google/gemini-2.5-flash).
+- Nếu cần đổi model, đặt `$env:OPENROUTER_MODEL="ID_MODEL_TREN_OPENROUTER"` trước khi chạy. Đổi model có thể làm khác yêu cầu worksheet; báo cáo JSON ghi model đã yêu cầu. Endpoint cố định: `https://openrouter.ai/api/v1/chat/completions`.
 - Sửa vai trò/quy tắc ở `SYSTEM_PROMPT`; sửa tình huống cụ thể tại từng trường `input` trong `ADVERSARIAL_TESTS` của `starter-code/prompt_prototype.py`.
 - Chương trình gọi API cho từng ca thử, nhận văn bản nguyên gốc, kiểm tra thẻ `[DRAFT_ONLY]`, cấu trúc JSON và nhãn mong đợi, rồi in `PASS` hoặc `FAIL`. Không tự thêm thẻ hoặc sửa câu trả lời để làm ca thử đạt.
 - `FAIL` là câu trả lời chưa đạt yêu cầu kiểm thử; khác với lỗi gọi API. Khi đó xem kết quả thực tế và điều chỉnh prompt nếu cần.
@@ -106,18 +129,19 @@ python -c "import os; print('API Key status: OK' if os.getenv('GROQ_API_KEY') el
 
 | Thông báo | Cách kiểm tra |
 | :--- | :--- |
-| Thiếu `GROQ_API_KEY` | Đặt key trong chính terminal đang chạy chương trình. |
-| Thiếu SDK `groq` | Chạy `python -m pip install -r requirements.txt` trong `.venv`. |
-| Key chứa Unicode/khoảng trắng hoặc vẫn là giá trị mẫu | Sao chép **giá trị key**, không phải tên mô tả key, từ Groq Console. Thay toàn bộ `KEY_GROQ_CUA_BAN` bằng key thật, không thêm dấu cách/xuống dòng. |
+| Thiếu `OPENROUTER_API_KEY` | Đặt key trong chính terminal đang chạy chương trình. |
+| Thiếu thư viện `httpx` | Chạy `python -m pip install -r requirements.txt` trong `.venv`. |
+| Key chứa Unicode/khoảng trắng hoặc vẫn là giá trị mẫu | Sao chép **giá trị key**, không phải tên mô tả key, từ OpenRouter. Thay toàn bộ `KEY_OPENROUTER_CUA_BAN` bằng key thật, không thêm dấu cách/xuống dòng. |
 | `UnicodeEncodeError` | Chương trình hiển thị encoding và vị trí lỗi, không in nội dung gây lỗi để tránh lộ key. Kiểm tra lại key và các header tùy chỉnh; không cần xóa dấu tiếng Việt khỏi prompt. |
-| HTTP 401 | Kiểm tra key Groq có đúng, còn hiệu lực và không dán kèm khoảng trắng. |
-| HTTP 403 | Đọc thông báo chi tiết và kiểm tra quyền truy cập của tài khoản/project/model trong Groq Console. |
-| HTTP 404 | Kiểm tra `GROQ_MODEL` và danh sách model đang được hỗ trợ. |
+| HTTP 401 | Kiểm tra key OpenRouter có đúng, còn hiệu lực và không dán kèm khoảng trắng. |
+| HTTP 402 | Kiểm tra credit và hạn mức chi tiêu của key/tài khoản OpenRouter. |
+| HTTP 403 | Đọc thông báo chi tiết, kiểm tra quyền truy cập và chính sách của key/model. |
+| HTTP 404 | Kiểm tra `OPENROUTER_MODEL` và danh sách model đang được hỗ trợ. |
 | HTTP 429 | Xem hạn mức và thời gian chờ; chạy lại sau khi hạn mức được phục hồi. |
 
-Tham khảo [Quickstart](https://console.groq.com/docs/quickstart) và [mã lỗi Groq](https://console.groq.com/docs/errors). Chương trình in mã HTTP và thông báo lỗi, đồng thời che key đang cấu hình.
+Tham khảo [Quickstart](https://openrouter.ai/docs/quickstart) và [mã lỗi OpenRouter](https://openrouter.ai/docs/api/reference/errors-and-debugging). Chương trình che key trong lỗi, kiểm tra cả trường `error` khi HTTP trả 200, và không tự retry. Timeout kết nối/đọc là 30 giây; không phải giới hạn tổng thời gian cả bộ ca thử.
 
-**Lưu ý khi nộp bài:** `autograder/autograder.py` hiện vẫn kiểm tra SDK Gemini và quy tắc của bài mẫu điều phối xe. Bộ chấm đó chưa tương thích với bản Vinhomes dùng Groq này; cần giảng viên xác nhận tiêu chí phù hợp. Bản chuyển đổi không sửa bộ chấm.
+**Lưu ý khi nộp bài:** Model mặc định là Gemini 2.5 Flash theo worksheet, nhưng `autograder/autograder.py` vẫn kiểm tra SDK Gemini trực tiếp và quy tắc của bài mẫu điều phối xe. Gọi Gemini qua OpenRouter không tự làm các kiểm tra đó đạt; cần giảng viên thống nhất tiêu chí cho Vinhomes/OpenRouter. Bản chuyển đổi không sửa bộ chấm.
 
 ---
 
