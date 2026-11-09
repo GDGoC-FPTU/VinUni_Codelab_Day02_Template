@@ -30,12 +30,33 @@ Một hướng MVP khả thi là **đối soát có xử lý ngoại lệ**: t�
 - Bài [*Coordinated vehicle dispatching and charging scheduling for an electric ride-hailing fleet under charging congestion and dynamic prices* — Tai-Yu Ma, Richard Connors, Francesco Viti (2024)](https://orbilu.uni.lu/handle/10993/63841) hỗ trợ hypothesis rằng điều phối sạc có thể xét nhu cầu, hàng đợi và giá động; kết quả nghiên cứu không phải bằng chứng về Green SM. Bài [*Generative AI at Work* — Erik Brynjolfsson, Danielle Li, Lindsey Raymond](https://doi.org/10.1093/qje/qjae044) là nguồn nghiên cứu nền về năng suất AI, không xác nhận các KPI hay tổn thất của Green SM; trang nhà xuất bản không fetch trực tiếp được trong lần kiểm tra lại.
 - Do đó: **fact có nguồn** là các tính năng và nội dung nghiên cứu được nêu bằng link; **hypothesis do AI tạo** là năm cơ hội, KPI ứng viên và MVP, cần dữ liệu nội bộ/pilot để kiểm định.
 
-## 4. Nguồn tham khảo
+## 4. Kết quả thực tế Phase 4–6
+
+### Phase 4 — Prototype và kiểm thử
+
+- `starter-code/prompt_prototype.py` đã được hoàn thiện bằng **Gemini 2.5 Flash** qua thư viện **`google-genai`**.
+- `SYSTEM_PROMPT` yêu cầu đầu ra có nhãn **`[DRAFT_ONLY]`**, không điều phối xe khi pin dưới 5% nếu không có trạm trong bán kính 5 km, có thể đề xuất `dispatch_mobile_charger`, và luôn cần người phê duyệt trước khi thực hiện.
+- Prototype có ba kiểm thử đối nghịch (adversarial tests). Các kiểm tra tĩnh 1–3 và `py_compile` đều đạt.
+- Tuy nhiên, runtime prototype/live autograder **không đạt**: Gemini trả về `400 INVALID_ARGUMENT: API key not valid` / `API_KEY_INVALID`. Vì vậy, không có kết quả an toàn từ model live nào được khẳng định. Cần cấu hình lại API key hợp lệ trước khi chạy lại; không ghi hoặc chia sẻ bất kỳ secret nào trong log này.
+
+Phạm vi cần được phân biệt rõ: **group deep-dive** tập trung vào các khiếu nại CSKH phức tạp, còn prototype starter này kiểm thử riêng ranh giới điều phối viên về pin/trạm sạc di động theo yêu cầu của khóa học/autograder. Prototype không phải bằng chứng production cho quy trình xử lý khiếu nại CSKH.
+
+### Phase 5 — Kết luận mức sẵn sàng
+
+Kết luận vẫn là **NOT YET**. Hiện còn thiếu dữ liệu khiếu nại nội bộ đã ẩn danh, baseline, nhãn routing, phê duyệt an toàn và mức sẵn sàng của các bên liên quan. Do đó chưa thể kết luận hiệu quả, an toàn hoặc khả năng triển khai production.
+
+### Phase 6 — Phản ánh và bước tiếp theo
+
+- **AI đã giúp:** nhanh chóng tạo và thu hẹp prompt, làm rõ các guardrail, sinh các ca kiểm thử đối nghịch và kiểm tra cú pháp prototype.
+- **Đã thất bại/chưa chắc chắn:** runtime không gọi được model vì API key không hợp lệ; vì vậy chưa biết hành vi an toàn thực tế của model live và chưa có bằng chứng về độ chính xác routing.
+- **Kiểm thử tiếp theo:** cấu hình lại key trong môi trường an toàn rồi chạy lại autograder; bổ sung các ca biên pin/trạm và kiểm tra human approval; sau đó đánh giá riêng trên dữ liệu khiếu nại CSKH đã ẩn danh với baseline và nhãn routing được phê duyệt.
+
+## 5. Nguồn tham khảo
 
 - **Nguồn chính thức (fact về tính năng), tác giả/publisher: Green SM (Khối Đồng hành & Phát triển Bác Tài Xanh):** [Green SM V-App — gợi ý lộ trình sạc và danh sách phiên sạc](https://www.greensm.com/vn-vi/news/ra-mat-tinh-nang-moi-goi-y-lo-trinh-sac-va-danh-sach-phien-sac-tren-ung-dung-v-app?utm_source=chatgpt.com); [Green SM Driver — đặt lịch bảo dưỡng, sửa chữa](https://www.greensm.com/vn-vi/news/huong-dan-dat-lich-bao-duong-sua-chua-xe-qua-ung-dung-green-sm-driver-1?utm_source=chatgpt.com).
 - **Nguồn nghiên cứu (bối cảnh, không phải số liệu Green SM):** [*Coordinated vehicle dispatching and charging scheduling for an electric ride-hailing fleet under charging congestion and dynamic prices* — Ma, Connors, Viti (2024)](https://orbilu.uni.lu/handle/10993/63841); [*Generative AI at Work* — Brynjolfsson, Li, Raymond](https://doi.org/10.1093/qje/qjae044), trang nhà xuất bản không fetch trực tiếp được trong lần kiểm tra lại.
 
-## 5. Phản ánh của sinh viên
+## 6. Phản ánh của sinh viên
 
 - AI đã giúp em làm gì nhanh hơn (mở rộng cơ hội, đặt tên chỉ số, thu hẹp MVP)?
 - Phần nào vẫn chưa chắc chắn vì thiếu dữ liệu nội bộ hoặc chưa kiểm chứng được?
