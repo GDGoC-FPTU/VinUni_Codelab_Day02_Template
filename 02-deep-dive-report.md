@@ -16,7 +16,7 @@
 | **6. Operational Boundary** | Không được tự đóng ticket hoặc đóng ticket chưa xong |
 
 ## 3.3. Future-State Flow & AI Fit (25 min)
-* **Xác định mức AI Fit (AI-Fit Matrix):** Giải pháp thuộc nhóm nào? [ ] Rule / State-Machine [X] LLM Feature [ ] Agentic Loop.
+* **Xác định mức AI Fit (AI-Fit Matrix):** Giải pháp thuộc nhóm nào? [X] Rule / State-Machine [X] LLM Feature [ ] Agentic Loop.
 * **Vẽ Future-State Flow:** Đánh dấu rõ:
   * 🔵 **AI Step:** Tác vụ LLM xử lý.
   * 🟢 **Human Step (HITL):** Bước con người phê duyệt/review (Human-in-the-loop).
