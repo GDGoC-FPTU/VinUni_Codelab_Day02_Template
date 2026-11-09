@@ -63,11 +63,11 @@ Hãy sử dụng **4 Lenses** dưới đây để quét qua hoạt động vận
 ### 📝 List bài toán của tôi:
 | # | Subsidiary (VinFast/Xanh SM...) | Lens | Mô tả ngắn bài toán |
 |---|----------------------------------|------|---------------------|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
+| 1 | **VinFast** | Tốn thời gian / Pain từ người khác | **Lệch pha cung - cầu và tồn kho xe điện cục bộ giữa các vùng:** Thiếu cơ chế dự báo nhu cầu động theo phiên bản/màu xe; điều phối thủ công dựa trên báo cáo tuần tĩnh dẫn đến showroom thiếu mẫu xe giao ngay trong khi kho khác tồn đọng. Giả định 5-10% giá trị vốn tồn kho xe bị phân bổ kém hiệu quả. |
+| 2 | **Vinmec** | Lặp lại / Rủi ro cao | **Rà soát thủ công hạn sử dụng (EXP) và số lô (Lot) kho dược phẩm:** Dược sĩ kiểm tra thủ công danh mục hàng nghìn loại thuốc trên bảng tính, dễ bỏ sót các lô thuốc đặc trị cận date (FEFO không triệt để). Giả định rủi ro hao hụt, tiêu hủy thuốc cận hạn chiếm 0.5-2% giá trị tồn kho dược phẩm mỗi năm. |
+| 3 | **Vinhomes** | Lặp lại & Tốn thời gian | **Quá tải tiếp nhận và phê duyệt yêu cầu đặt lịch tiện ích nội khu:** Lễ tân/BQL tiếp nhận yêu cầu phân tán (App, hotline, tin nhắn); nhân viên tra cứu lịch trống thủ công, đối soát nội quy và soạn xác nhận mất 5-15 phút/yêu cầu, gây trễ hẹn và quá tải giờ cao điểm. |
+| 4 | **Vinpearl** | Tốn thời gian / Lãng phí nguồn lực | **Phân công dọn phòng (Housekeeping) tĩnh, lệch nhịp check-out thực tế:** Giám sát buồng phòng chia danh sách cố định đầu ca, chưa cập nhật linh hoạt theo giờ khách thực tế trả phòng hoặc nhu cầu ưu tiên phòng VIP check-in sớm. Giả định lãng phí 10-20% giờ công lao động do nhân viên phải chờ việc hoặc di chuyển chéo tầng. |
+| 5 | **VinUni** | Lặp lại & Tốn thời gian | **Tiếp nhận và xử lý thủ tục hành chính, dịch vụ sinh viên thủ công:** Chuyên viên Đào tạo/Công tác sinh viên đọc email, biểu mẫu tự do (xin bảng điểm, giấy xác nhận, bảo lưu, chuyển lớp), đối chiếu quy chế và soạn văn bản trả lời mất 10-20 phút/yêu cầu, kéo dài thời gian chờ đợi (SLA) của sinh viên. |
 
 ---
 

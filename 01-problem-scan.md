@@ -139,8 +139,11 @@
 
 ## 🎯 Đề Xuất Lựa Chọn Đề Tài Deep-Dive
 
-* **Bài toán đề xuất Deep-Dive:** **Thẻ 1 — Vinhomes Amenity Booking Copilot** (hoặc **Thẻ 3 — VinFast EV Inventory Rebalancing Assistant**).
+* **Bài toán đề xuất Deep-Dive:** **Thẻ 2: Vinmec — Giám sát & Cảnh báo Sớm Rủi ro Thuốc Cận Date (FEFO)** (*Vinmec Pharmacy Expiry Sentinel*).
 * **Lý do lựa chọn:**
-  1. **Dữ liệu rõ ràng & có thể mô phỏng:** Dữ liệu khung giờ (slot), thông tin tiện ích và quy chế đặt phòng (hoặc danh mục xe tồn kho) hoàn toàn có thể giả lập để viết kiểm thử an toàn (Adversarial test cases) ngay trong buổi lab.
-  2. **Ranh giới an toàn (Operational Boundary) sắc bén:** AI chỉ được phép tra cứu, đối soát và soạn bản nháp có gắn cờ `[DRAFT_ONLY]`; AI **tuyệt đối không được tự ý chốt lệnh** nếu chưa có xác nhận từ người có thẩm quyền.
-  3. **Tỷ lệ AI-Fit tối ưu:** Kết hợp Rule-based (kiểm tra logic slot, tránh double-booking) với LLM (xử lý ngôn ngữ tự nhiên từ cư dân), mang lại hiệu quả cao mà không cần hệ thống Multi-Agent phức tạp.
+  1. **Tác động kinh tế và an toàn điều trị rất lớn (High Impact):** Dược phẩm cận date hoặc hết hạn không chỉ gây tổn thất tài chính trực tiếp (giả định 0.5–2% giá trị tồn kho mỗi năm) mà còn tiềm ẩn nguy cơ an toàn y tế nghiêm trọng nếu bỏ sót lô thuốc hết hạn. Việc tự động hóa giám sát giúp loại bỏ hoàn toàn sai sót do con người rà soát thủ công.
+  2. **Ranh giới an toàn (Operational Boundary) sắc bén & chuẩn mực y tế:** Dữ liệu số lô (Lot), hạn dùng (EXP) và tốc độ tiêu thụ có cấu trúc rõ ràng. AI chỉ được phép quét cảnh báo và soạn thảo bản nháp đề xuất luân chuyển có gắn thẻ `[DRAFT_ONLY]`; AI **tuyệt đối không được tự ý ra y lệnh điều trị, không tự ý hủy thuốc hay điều chuyển** mà bắt buộc phải qua bước phê duyệt của Dược sĩ phụ trách kho và Trưởng khoa Lâm sàng (Human-in-the-loop).
+  3. **Tỷ lệ AI-Fit tối ưu (Rule Engine + LLM Feature):** Dùng Rule-based/Data Analytics tính toán tốc độ tiêu thụ và lọc hạn dùng theo nguyên tắc FEFO (chính xác 100%), kết hợp LLM để tóm tắt danh sách ưu tiên hành động và soạn nháp báo cáo/email điều chuyển thuốc chuyên nghiệp.
+* **Lý do không chọn Thẻ 1 (Vinhomes) & Thẻ 3 (VinFast):**
+  * *Thẻ 1 (Vinhomes):* Bài toán đặt tiện ích mang tính chất dịch vụ dân sự thông thường, ít rủi ro và giá trị nghiệp vụ không mang tính sống còn như kiểm soát date dược phẩm trong bệnh viện.
+  * *Thẻ 3 (VinFast):* Bài toán điều chuyển xe điện toàn quốc phụ thuộc vào mạng lưới logistics phức tạp và biến động chính sách bán hàng theo tháng, cần khối lượng dữ liệu lịch sử lớn hơn để xác lập baseline chuẩn.
