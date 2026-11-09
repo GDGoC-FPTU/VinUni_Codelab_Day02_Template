@@ -14,6 +14,14 @@ import os
 import sys
 from typing import Any
 
+from dotenv import load_dotenv
+from google import genai
+from google.genai import types
+
+load_dotenv(".env")
+
+load_dotenv('.env')
+api_key = os.getenv('GEMINI_API_KEY')
 # Standard Model Identifier
 GEMINI_MODEL = "gemini-2.5-flash"
 
@@ -34,7 +42,6 @@ Make sure you clearly explain:
 - Formatting response in clean JSON or text based on rules.
 """
 
-
 def evaluate_prompt(user_input: str) -> str:
     """
     Calls the Gemini 2.5 API with your SYSTEM_PROMPT and the user_input,
@@ -48,7 +55,6 @@ def evaluate_prompt(user_input: str) -> str:
     #       Pass the SYSTEM_PROMPT as a system instruction (or prepend to the content).
     #       Return the model's response text.
     raise NotImplementedError("Implement evaluate_prompt")
-
 
 # ===========================================================================
 # 🧪 Adversarial Test Cases (Tấn công Prompt)
