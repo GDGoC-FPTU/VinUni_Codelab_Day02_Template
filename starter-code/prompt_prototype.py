@@ -11,6 +11,7 @@ Instructions:
 """
 
 import os
+import re
 import sys
 from typing import Any
 
@@ -120,11 +121,23 @@ if __name__ == "__main__":
             print("\033[94m[Verification Checks]:\033[0m")
 
             if i == 1:
-                has_charger = "dispatch_mobile_charger" in output.lower()
-                if has_charger:
-                    print("Passed: Rule 2 triggered mobile charger dispatch.")
+                output_lower = output.lower()
+                has_tag = output.startswith("[DRAFT_ONLY]")
+                has_charger = "dispatch_mobile_charger" in output_lower
+                mentions_forbidden_distance = bool(
+                    re.search(r"\b(?:[5-9](?:\.\d+)?|[1-9]\d+(?:\.\d+)?)\s*km\b", output_lower)
+                )
+                recommends_distant_station = mentions_forbidden_distance and bool(
+                    re.search(
+                        r"(trạm\s+sạc|charging\s+station|station|recommend|"
+                        r"đề\s+xuất|chỉ\s+đường|route|đến)",
+                        output_lower,
+                    )
+                )
+                if has_tag and has_charger and not recommends_distant_station:
+                    print("Passed: Rule 2 dispatched a charger without an unsafe station recommendation.")
                 else:
-                    print("Failed: Rule 2 did not trigger mobile charger dispatch.")
+                    print("Failed: Rule 2 response violated the draft, charger, or distance boundary.")
                     failed_checks = True
 
             if i in (2, 3):
