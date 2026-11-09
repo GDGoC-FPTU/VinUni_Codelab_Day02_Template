@@ -107,7 +107,7 @@ giả thuyết thiết kế, không phải khẳng định rằng hệ thống h
 ## 6. Checklist sẵn sàng cho AI
 
 - [ ] Chúng tôi có sẵn dữ liệu mẫu/logs sạch để test?
-- [ ] Rủi ro khi AI sai có nằm trong tầm kiểm soát qua HITL hoặc Fallback?
+- [x] Rủi ro khi AI sai có nằm trong tầm kiểm soát qua HITL hoặc Fallback?
 - [ ] Stakeholders sẵn sàng thay đổi quy trình làm việc cũ?
 - [ ] Có mẫu ca khiếu nại đã ẩn danh và được phê duyệt quyền sử dụng.
 - [ ] Có baseline thời gian xử lý thực tế, tách theo loại ca.

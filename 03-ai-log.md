@@ -59,7 +59,39 @@ Kết luận vẫn là **NOT YET**. Hiện còn thiếu dữ liệu khiếu nạ
 
 ## 6. Phản ánh của sinh viên
 
-- AI đã giúp em làm gì nhanh hơn (mở rộng cơ hội, đặt tên chỉ số, thu hẹp MVP)?
-- Phần nào vẫn chưa chắc chắn vì thiếu dữ liệu nội bộ hoặc chưa kiểm chứng được?
-- Em đã độc lập sửa hoặc loại bỏ kết luận nào của AI sau khi kiểm tra nguồn và tính năng hiện có?
-- Nếu tiếp tục, em sẽ xin dữ liệu nào để kiểm định các giả định và đo hiệu quả MVP?
+### AI đã giúp em làm gì nhanh hơn?
+
+AI giúp em mở rộng nhanh năm cơ hội vận hành, đặt tên các chỉ số ứng viên và
+thu hẹp phạm vi qua ba Quick Problem Cards. Sau đó, AI hỗ trợ so sánh Rule,
+LLM và Agentic Loop, viết lại workflow tương lai có HITL/Fallback, tạo các ca
+adversarial và hoàn thiện prototype Gemini. Việc chạy autograder và kiểm tra
+Structured Output giúp em xác nhận ranh giới kỹ thuật thay vì chỉ dựa vào
+văn bản prompt.
+
+### Phần nào vẫn chưa chắc chắn?
+
+Em chưa có dữ liệu nội bộ để xác nhận 100.000 chuyến/ngày, tỷ lệ khiếu nại 2%,
+15 phút mỗi ca, 500 staff-hours/ngày hoặc các KPI mục tiêu. Em cũng chưa có
+sample khiếu nại đã ẩn danh, baseline thực tế, nhãn routing và tiêu chí chấm
+chất lượng phản hồi. Prototype live kiểm thử thành công ranh giới pin/sạc,
+nhưng đó là bài starter riêng, chưa chứng minh độ chính xác của use case
+CSKH; dịch vụ Flash-Lite đôi lúc còn trả `503 UNAVAILABLE` khi nhu cầu cao.
+
+### Em đã sửa hoặc loại bỏ kết luận nào của AI?
+
+Em đã loại bỏ claim không có nguồn rằng Green SM mất hàng tỷ đồng mỗi năm do
+điều phối sạc thủ công, và không đề xuất xây lại tính năng V-App đã được công
+bố. Em chuyển các con số thành giả định pilot, kiểm tra lại nguồn Green SM,
+giữ rule engine cho quyết định tiền, thêm yêu cầu human approval và chọn LLM
+Feature thay vì autonomous Agent. Em cũng thay model cũ không khả dụng bằng
+`gemini-3.5-flash-lite`, đồng thời thêm schema JSON và kiểm tra đầu ra trước
+khi chạy assertion.
+
+### Nếu tiếp tục, em sẽ xin dữ liệu nào?
+
+Em sẽ xin mẫu khiếu nại đã ẩn danh và được phê duyệt quyền sử dụng; log thời
+gian theo từng bước và loại ca; dữ liệu routing đã gắn nhãn; lịch sử mở lại,
+escalation và kết quả xử lý; tiêu chí đánh giá factuality, hallucination,
+PII và chất lượng bản nháp; cùng log audit HITL, fallback và latency. Em sẽ
+dùng các dữ liệu này để dựng baseline, chạy shadow-mode trước, rồi mới đánh
+giá assisted pilot theo các ngưỡng đã được stakeholder phê duyệt.
