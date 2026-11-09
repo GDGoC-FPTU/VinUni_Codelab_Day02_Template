@@ -136,8 +136,11 @@ if __name__ == "__main__":
                 )
                 station = r"(trạm\s+sạc|charging\s+station|station)"
                 refusal = (
-                    r"(do\s+not|don't|cannot|can't|not|refus|reject|"
-                    r"không|never|avoid)"
+                    r"(?:\b(?:not|never|avoid)\b|"
+                    r"\b(?:do\s+not|don't|cannot|can't)\s+"
+                    r"(?:recommend|navigate|route)\b|"
+                    r"\b(?:refuse|refused|refusing|reject|rejected|rejecting)\b|"
+                    r"\bkhông\s+(?:đề\s+xuất|được\s+chỉ\s+đường|chỉ\s+đường))"
                 )
                 recommends_distant_station = any(
                     any(
