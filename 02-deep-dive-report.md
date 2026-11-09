@@ -51,8 +51,9 @@ phỏng vấn nhân viên.
 
 | Phương án | Mức phù hợp | Lý do |
 |---|---|---|
-| **LLM Feature — chọn** | Cao cho pilot có kiểm soát | Tóm tắt hồ sơ đã được phép truy cập, đề xuất phân loại/tuyến và soạn nháp giúp giảm thao tác lặp lại; nhân viên vẫn kiểm tra và quyết định. |
-| Autonomous Agent — loại | Không phù hợp ở giai đoạn này | Agent tự truy cập nhiều nguồn, liên hệ tài xế, escalation hoặc gửi kết quả có thể vượt quyền, làm lộ dữ liệu, bịa thông tin hoặc tự quyết định ca nhạy cảm. Luồng này đòi hỏi quyền hạn và kiểm soát chưa được xác nhận. |
+| **Rule / State-Machine** | Phù hợp cho lớp kiểm soát | Xử lý tốt các kiểm tra xác định như trường bắt buộc, quyền truy cập và định tuyến theo quy tắc. Tuy nhiên, không phù hợp để hiểu ngữ cảnh khiếu nại tiếng Việt nhiều sắc thái, tái dựng diễn biến hoặc soạn phản hồi tự nhiên. |
+| **LLM Feature — chọn** | Cao cho pilot có kiểm soát | Phù hợp để tóm tắt hồ sơ đã được phép truy cập, gợi ý phân loại/tuyến và soạn nháp trong các ca tiếng Việt có ngữ cảnh; nhân viên vẫn kiểm tra và quyết định. |
+| **Autonomous Agent — loại** | Không phù hợp ở giai đoạn này | Agent tự truy cập nhiều nguồn, liên hệ tài xế, escalation hoặc gửi kết quả có thể vượt quyền, làm lộ dữ liệu, bịa thông tin hoặc tự quyết định ca nhạy cảm. Rủi ro tự chủ và quyền hạn chưa được kiểm soát đầy đủ. |
 
 **Quyết định:** chọn **LLM Feature**, không chọn autonomous Agent. Đây là
 giả thuyết thiết kế, không phải khẳng định rằng hệ thống hiện tại đã sẵn sàng.
@@ -62,12 +63,15 @@ giả thuyết thiết kế, không phải khẳng định rằng hệ thống h
 1. **Tiếp nhận và kiểm tra bằng rule:** kiểm tra quyền truy cập, mã ca/mã
    chuyến và các trường bắt buộc. Nếu thiếu trường, không đủ quyền hoặc dữ
    liệu không khả dụng, yêu cầu bổ sung hoặc chuyển sang quy trình thủ công.
-2. **LLM hỗ trợ:** chỉ trong deployment/provider đã được phê duyệt và trên
-   phần dữ liệu đã được tối thiểu hóa, che/ẩn PII, tạo bản tóm tắt timeline,
-   gợi ý danh mục và tuyến xử lý, đồng thời soạn bản nháp phản hồi. Mọi
-   trường không có bằng chứng phải được đánh dấu là chưa xác minh. Không
-   chuyển dữ liệu khách hàng chưa được phê duyệt ra ngoài môi trường được
-   ủy quyền.
+2. **LLM hỗ trợ:** chỉ trong deployment/provider đã được phê duyệt, giữ dữ
+   liệu trong môi trường được ủy quyền và tắt việc provider dùng dữ liệu để
+   huấn luyện. Trước khi xử lý, phải xóa/tokenize tên, số điện thoại, biển
+   số, mã tài khoản và vị trí chính xác, trừ khi trường đó thực sự bắt buộc.
+   Chỉ người đánh giá/đầu mối chất lượng CS được chỉ định mới có quyền truy
+   cập. LLM tạo bản tóm tắt timeline, gợi ý danh mục/tuyến và soạn nháp;
+   mọi trường không có bằng chứng phải được đánh dấu là chưa xác minh.
+   Không chuyển dữ liệu khách hàng chưa được phê duyệt ra ngoài môi trường
+   được ủy quyền.
 3. **Kiểm tra confidence/chất lượng:** nhân viên kiểm tra độ đầy đủ, nguồn
    của dữ kiện, sự phù hợp của phân loại và chất lượng ngôn ngữ. Confidence
    thấp, mâu thuẫn dữ liệu hoặc ca nhạy cảm thì chuyển ngay sang fallback.
@@ -86,10 +90,13 @@ giả thuyết thiết kế, không phải khẳng định rằng hệ thống h
 - Không tự đóng ca nhạy cảm, tranh chấp nghiêm trọng hoặc vấn đề pháp lý.
 - Không truy cập dữ liệu ngoài quyền được cấp.
 - Chỉ dùng deployment/provider đã được phê duyệt; phải tối thiểu hóa và
-  che/ẩn PII khách hàng, tài xế trước khi xử lý.
-- Phải có kiểm soát truy cập theo vai trò, thời hạn lưu giữ/xóa dữ liệu và
-  audit log; không gửi dữ liệu khách hàng chưa được phê duyệt ra ngoài môi
-  trường được ủy quyền.
+  che/ẩn PII khách hàng, tài xế trước khi xử lý; xóa/tokenize tên, số điện
+  thoại, biển số, mã tài khoản và vị trí chính xác trừ khi thực sự bắt buộc.
+- Provider phải tắt việc dùng dữ liệu để huấn luyện, giữ dữ liệu trong môi
+  trường được ủy quyền và không nhận dữ liệu khách hàng chưa được phê duyệt.
+- Chỉ đầu mối chất lượng CS/đánh giá viên được chỉ định mới được truy cập;
+  lưu prompt/output tối đa 30 ngày rồi xóa có xác minh, đồng thời audit cả
+  sự kiện truy cập và xóa dữ liệu.
 - Không bịa, suy diễn hoặc trình bày dữ kiện chưa xác minh như sự thật.
 - Không thay thế chuyên gia vận hành, nhóm xử lý chuyên biệt hoặc rà soát
   pháp chế.
@@ -101,7 +108,8 @@ giả thuyết thiết kế, không phải khẳng định rằng hệ thống h
 - [ ] Có nhãn định tuyến đúng và tiêu chí chất lượng phản hồi.
 - [ ] Đã kiểm kê nguồn dữ liệu, quyền truy cập và trường bắt buộc.
 - [ ] Đã phê duyệt deployment/provider, quy tắc tối thiểu hóa/che PII, thời
-      hạn lưu giữ/xóa và kiểm soát truy cập.
+      hạn lưu giữ/xóa và kiểm soát truy cập; provider đã tắt huấn luyện trên
+      dữ liệu pilot.
 - [ ] Có người chịu trách nhiệm HITL, escalation và rà soát pháp chế.
 - [ ] Có log audit cho đầu vào, bản nháp, chỉnh sửa, phê duyệt và fallback.
 - [ ] Có tiêu chí đo hallucination, rò rỉ dữ liệu, gửi trái phép và mở lại ca.
@@ -115,8 +123,11 @@ của các bên liên quan; các metric và giả định trong báo cáo cũng 
 kiểm chứng bằng dữ liệu nội bộ.
 
 Bước tiếp theo được khuyến nghị là **pilot shadow-mode**: LLM chỉ tạo tóm
-tắt, phân loại và bản nháp song song với quy trình hiện tại; nhân viên không
-nhìn thấy hoặc không dùng đầu ra để tự động gửi, bồi thường hay đóng ca.
+tắt, phân loại và bản nháp song song với quy trình hiện tại; đầu ra được ẩn
+khỏi người ra quyết định vận hành và khách hàng, chỉ hiển thị cho các đầu
+mối đánh giá được chỉ định trong phạm vi quyền truy cập đã phê duyệt để rà
+soát offline tính đúng dữ kiện và chất lượng. Không dùng đầu ra để tự động
+gửi, bồi thường hay đóng ca.
 Ở shadow mode, chỉ đo các chỉ số offline: độ chính xác định tuyến, mức bao
 phủ trường bắt buộc, độ đúng/sát dữ kiện và chất lượng bản nháp qua rà soát,
 cùng latency. **Thời gian xử lý, tỷ lệ mở lại và định tuyến trực tiếp không
