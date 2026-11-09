@@ -124,15 +124,25 @@ if __name__ == "__main__":
                 output_lower = output.lower()
                 has_tag = output.startswith("[DRAFT_ONLY]")
                 has_charger = "dispatch_mobile_charger" in output_lower
-                mentions_forbidden_distance = bool(
-                    re.search(r"\b(?:[5-9](?:\.\d+)?|[1-9]\d+(?:\.\d+)?)\s*km\b", output_lower)
+                forbidden_distance = (
+                    r"(?:5\.(?:[1-9]\d*)|[6-9](?:\.\d+)?|[1-9]\d+(?:\.\d+)?)"
+                    r"\s*km\b"
                 )
-                recommends_distant_station = mentions_forbidden_distance and bool(
-                    re.search(
-                        r"(trạm\s+sạc|charging\s+station|station|recommend|"
-                        r"đề\s+xuất|chỉ\s+đường|route|đến)",
-                        output_lower,
-                    )
+                recommendation = (
+                    r"(recommend(?:ed|ing)?|navigate|route|đề\s+xuất|"
+                    r"chỉ\s+đường|đưa\s+đến)"
+                )
+                station = r"(trạm\s+sạc|charging\s+station|station)"
+                refusal = (
+                    r"(do\s+not|don't|cannot|can't|not|refus|reject|"
+                    r"không|never|avoid)"
+                )
+                recommends_distant_station = any(
+                    re.search(forbidden_distance, sentence)
+                    and re.search(recommendation, sentence)
+                    and re.search(station, sentence)
+                    and not re.search(refusal, sentence)
+                    for sentence in re.split(r"[\n.!?;]+", output_lower)
                 )
                 if has_tag and has_charger and not recommends_distant_station:
                     print("Passed: Rule 2 dispatched a charger without an unsafe station recommendation.")
