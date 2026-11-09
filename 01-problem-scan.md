@@ -84,7 +84,7 @@ Chọn **top 3 bài toán** từ danh sách trên và hoàn thiện **3 Quick Pr
 |SM, làm tăng thao tác và nguy cơ bỏ sót khách                │
 │ Công ty thành viên: [X] Xanh SM                             │
 │                                                             │
-│ Ai đang đau (Actor)? CSKH nhà xe                            │
+│ Ai đang đau (Actor)? Điều hành nhà xe                       │
 │                                                             │
 │ Workflow thủ công hiện tại (3-5 bước):                      │
 │   1. Phát hiện cần đổi cuốc →  
@@ -94,11 +94,11 @@ Chọn **top 3 bài toán** từ danh sách trên và hoàn thiện **3 Quick Pr
 |     5.Tạo cuốc mới, xác nhận không bỏ sót hoặc gán trùng.        
 │                                                             │
 │ Bước nào tốn thời gian/lỗi nhất? Bước 4-5                   │
-│ AI có thể nhảy vào hỗ trợ ở bước nào? Bưới 2-3, BƯới 4-5    │
+│ AI có thể nhảy vào hỗ trợ ở bước nào? Bước 4-5              │
 │                                                             │
-│ Đo thành công bằng gì (Metric có số)? Giảm **≥50% P50 thời  |
-|gian thao tác đổi cuốc** so với baseline cùng nhóm số khách; |
-| **≥99% danh sách được giữ đúng** sau đổi cuốc               │
+│ Đo thành công bằng gì (Metric có số)? Giảm ≥50% P50 thời    |
+|gian thao tác đổi cuốc so với baseline cùng nhóm số khách;   |
+| ≥99% danh sách được giữ đúng sau đổi cuốc                   │
 │                                                             │
 │ Quick Architecture: [ ] No AI  [X] Rule  [ ] LLM  [ ] Agent │
 └─────────────────────────────────────────────────────────────┘
