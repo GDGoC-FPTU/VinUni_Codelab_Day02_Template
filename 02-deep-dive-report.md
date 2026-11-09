@@ -53,7 +53,7 @@ phỏng vấn nhân viên.
 |---|---|---|
 | **Rule / State-Machine** | Phù hợp cho lớp kiểm soát | Xử lý tốt các kiểm tra xác định như trường bắt buộc, quyền truy cập và định tuyến theo quy tắc. Tuy nhiên, không phù hợp để hiểu ngữ cảnh khiếu nại tiếng Việt nhiều sắc thái, tái dựng diễn biến hoặc soạn phản hồi tự nhiên. |
 | **LLM Feature — chọn** | Cao cho pilot có kiểm soát | Phù hợp để tóm tắt hồ sơ đã được phép truy cập, gợi ý phân loại/tuyến và soạn nháp trong các ca tiếng Việt có ngữ cảnh; nhân viên vẫn kiểm tra và quyết định. |
-| **Autonomous Agent — loại** | Không phù hợp ở giai đoạn này | Agent tự truy cập nhiều nguồn, liên hệ tài xế, escalation hoặc gửi kết quả có thể vượt quyền, làm lộ dữ liệu, bịa thông tin hoặc tự quyết định ca nhạy cảm. Rủi ro tự chủ và quyền hạn chưa được kiểm soát đầy đủ. |
+| **Agentic Loop / Autonomous Agent — loại** | Không phù hợp ở giai đoạn này | Agent tự truy cập nhiều nguồn, liên hệ tài xế, escalation hoặc gửi kết quả có thể vượt quyền, làm lộ dữ liệu, bịa thông tin hoặc tự quyết định ca nhạy cảm. Rủi ro tự chủ và quyền hạn chưa được kiểm soát đầy đủ. |
 
 **Quyết định:** chọn **LLM Feature**, không chọn autonomous Agent. Đây là
 giả thuyết thiết kế, không phải khẳng định rằng hệ thống hiện tại đã sẵn sàng.
@@ -63,6 +63,7 @@ giả thuyết thiết kế, không phải khẳng định rằng hệ thống h
 1. **Tiếp nhận và kiểm tra bằng rule:** kiểm tra quyền truy cập, mã ca/mã
    chuyến và các trường bắt buộc. Nếu thiếu trường, không đủ quyền hoặc dữ
    liệu không khả dụng, yêu cầu bổ sung hoặc chuyển sang quy trình thủ công.
+   **🔵 Rule/State-Machine Step:** lớp kiểm soát xác định trước khi gọi LLM.
 2. **LLM hỗ trợ:** chỉ trong deployment/provider đã được phê duyệt, giữ dữ
    liệu trong môi trường được ủy quyền và tắt việc provider dùng dữ liệu để
    huấn luyện. Trước khi xử lý, phải xóa/tokenize tên, số điện thoại, biển
@@ -72,13 +73,15 @@ giả thuyết thiết kế, không phải khẳng định rằng hệ thống h
    mọi trường không có bằng chứng phải được đánh dấu là chưa xác minh.
    Không chuyển dữ liệu khách hàng chưa được phê duyệt ra ngoài môi trường
    được ủy quyền.
+   **🔵 AI Step:** LLM tóm tắt, phân loại và soạn phản hồi nháp.
 3. **Kiểm tra confidence/chất lượng:** nhân viên kiểm tra độ đầy đủ, nguồn
    của dữ kiện, sự phù hợp của phân loại và chất lượng ngôn ngữ. Confidence
    thấp, mâu thuẫn dữ liệu hoặc ca nhạy cảm thì chuyển ngay sang fallback.
-4. **HITL approval:** nhân viên có thẩm quyền duyệt/chỉnh bản nháp, quyết
+   **🔵 AI Step:** kết quả được kiểm tra trước khi đưa cho người duyệt.
+4. **🟢 Human Step (HITL) — approval:** nhân viên có thẩm quyền duyệt/chỉnh bản nháp, quyết
    định escalation và thực hiện các hành động được phép. Không có bước gửi
    tự động.
-5. **Fallback thủ công:** dùng quy trình hiện tại khi thiếu dữ liệu, hệ
+5. **↩️ Fallback thủ công:** dùng quy trình hiện tại khi thiếu dữ liệu, hệ
    thống lỗi, confidence thấp, ca có rủi ro cao hoặc cần chuyên gia/pháp
    chế. Kết quả pilot được ghi nhận để đánh giá, không dùng để tự động học
    trực tiếp trong lúc xử lý ca.
@@ -103,6 +106,9 @@ giả thuyết thiết kế, không phải khẳng định rằng hệ thống h
 
 ## 6. Checklist sẵn sàng cho AI
 
+- [ ] Chúng tôi có sẵn dữ liệu mẫu/logs sạch để test?
+- [ ] Rủi ro khi AI sai có nằm trong tầm kiểm soát qua HITL hoặc Fallback?
+- [ ] Stakeholders sẵn sàng thay đổi quy trình làm việc cũ?
 - [ ] Có mẫu ca khiếu nại đã ẩn danh và được phê duyệt quyền sử dụng.
 - [ ] Có baseline thời gian xử lý thực tế, tách theo loại ca.
 - [ ] Có nhãn định tuyến đúng và tiêu chí chất lượng phản hồi.
