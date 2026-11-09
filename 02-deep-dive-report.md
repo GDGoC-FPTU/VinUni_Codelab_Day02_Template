@@ -81,6 +81,48 @@ Sạc và đi tiếp
 
 ---
 
+# 🏁 Phase 5 — EVALUATE
+
+### AI Readiness Checklist
+
+| | Tiêu chí | Hiện trạng và bằng chứng |
+|---|---|---|
+| [ ] | Có sẵn dữ liệu mẫu/logs sạch để test? | **Chưa.** Không có log lập kế hoạch sạc, log tổng đài hay dữ liệu trụ theo thời gian. Mới chỉ có thông tin báo chí và các trang tra cứu công khai. |
+| [x] | Rủi ro khi AI sai nằm trong tầm kiểm soát? | **Có, ở mức thiết kế.** Rule quyết định tầm pin và loại cổng, LLM không được chọn trạm, tài xế xác nhận phương án, có fallback sang form thường và tổng đài/cứu hộ. Chưa được kiểm chứng bằng test thực tế. |
+| [ ] | Stakeholders sẵn sàng thay đổi quy trình? | **Chưa xác nhận.** Chưa trao đổi với đội app VinFast, V-GREEN và tổng đài; chưa khảo sát tài xế. |
+
+### Quyết định
+
+[ ] **GO**  
+[x] **NOT YET (Cần tích lũy thêm dữ liệu/xác lập baseline)**  
+[ ] **NO-GO**
+
+**Justification:**
+
+> Bài toán có thật ở mức định tính: báo chí ghi nhận nhiều trạm kín chỗ giờ cao điểm. Nhưng hiện chưa đủ bằng chứng để bắt đầu xây dựng, vì bốn lý do:
+>
+> 1. **Chưa có baseline.** Các mốc 12-21 phút/lượt chỉ là giả định, nên chưa tính được lợi ích hay hoàn vốn.
+> 2. **Giá trị tăng thêm chưa rõ.** Các trang tra cứu công khai đã hiển thị trụ trống, loại đầu sạc và công suất. Cần chứng minh tài xế vẫn gặp khó sau khi đã có những công cụ này.
+> 3. **Rủi ro lớn nhất nằm ở dữ liệu, không ở mô hình.** Nếu tình trạng trụ không còn đúng khi tài xế đến nơi, phương án vẫn sai dù LLM hoạt động hoàn hảo. Độ tin cậy của dữ liệu này chưa được đo.
+> 4. **Chưa chứng minh cần LLM.** Phần quyết định là rule. Nếu tài xế hiếm khi đưa ra yêu cầu tự do, một bộ lọc thông minh sẽ rẻ và an toàn hơn.
+>
+> Không chọn **NO-GO** vì phần rule có giá trị tiềm năng và rủi ro có thể kiểm soát. Chi phí LLM không phải điểm chặn, vì mỗi yêu cầu chỉ cần hai lượt gọi ngắn; chi phí thực tế vẫn cần đo.
+
+### Điều kiện để chuyển sang GO
+
+| # | Điều kiện | Ngưỡng |
+|---|---|---|
+| 1 | Đo thời gian lập phương án trên 20 tài xế | Có baseline; tiết kiệm được ít nhất 5 phút/lượt |
+| 2 | Phân tích 4 tuần log tổng đài | Có số cuộc gọi hỏi trạm sạc và tỉ lệ đến nơi hết trụ |
+| 3 | Đo độ tin cậy dữ liệu trụ | Trạng thái trụ còn đúng khi đến nơi ở ≥ 95% trường hợp |
+| 4 | Thử bản chỉ dùng rule trên 200 kịch bản | 100% đúng cổng và trong tầm pin có dự phòng |
+| 5 | Phân tích nhu cầu yêu cầu tự do | ≥ 20% yêu cầu có ràng buộc mà bộ lọc không diễn đạt được; nếu thấp hơn thì bỏ LLM |
+| 6 | Thống nhất với đội app, V-GREEN và tổng đài | Có người phụ trách và được cấp quyền truy cập API |
+
+Nếu đạt, bắt đầu **GO với scope hẹp**: một tuyến liên tỉnh, một nhóm tài xế thử nghiệm, tài xế luôn xác nhận phương án.
+
+---
+
 ## Nguồn tham khảo
 
 Thông tin công khai, không phải dữ liệu nội bộ; các nguồn chưa thống nhất về độ phủ, nên cần xác nhận với VinFast/V-GREEN.
