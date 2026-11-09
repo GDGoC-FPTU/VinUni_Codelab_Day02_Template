@@ -15,13 +15,13 @@ Hãy sử dụng **4 Lenses** dưới đây để quét qua hoạt động vận
 
 | # | Subsidiary (VinFast/Xanh SM...) | Lens | Mô tả ngắn bài toán |
 |---|----------------------------------|------|---------------------|
-| 1 | Xanh SM                         | AI-upgrade | Complex customer-support escalation copilot for lost items, fare errors, and trip incidents. |
+| 1 | Xanh SM                         | AI-upgrade | Complex customer-support escalation copilot for lost items, fare errors, and trip incidents; drafts only, with human approval for customer-facing action, escalation, and privacy-safe handling of trip data. |
 | 2 | Xanh SM                         | Lặp lại | Detect and explain reconciliation exceptions for fares, promotions, bonuses, refunds, and driver income while the rule engine decides final money. |
 | 3 | Xanh SM                         | Lặp lại | Post-check shift handover photos for damage and image quality, and route suspicious cases to a supervisor. |
 | 4 | Xanh SM                         | Tốn thời gian | Prioritize vehicle incidents and suggest a workshop/schedule using fault descriptions and maintenance history, without safety diagnosis or repair approval. |
-| 5 | Xanh SM                         | Stakeholder Pain | Fleet-level charging schedule using demand, battery, queues, and station capacity, without rebuilding existing V-App charging features. |
+| 5 | Xanh SM                         | Stakeholder Pain | Fleet-level charging schedule using demand, battery, queues, and station capacity, without rebuilding existing V-App charging features; human dispatchers approve changes, and safety limits, driver privacy, and charger controls remain enforced. |
 
-**Evidence note:** Official sources confirm existing V-App charging/session features and online maintenance booking. Internal workload, time, and annual loss figures are not publicly confirmed; numeric business cases must be labeled hypothetical pilot assumptions.
+**Evidence note:** Official sources: [VinFast — “Dịch vụ sạc pin”](https://vinfastauto.com/vn_vi/dich-vu-sac-pin) (V-App charging/session features) and [VinFast — “Đặt lịch dịch vụ”](https://vinfastauto.com/vn_vi/dat-lich-bao-duong) (online maintenance booking). These confirm existing product capabilities; internal workload, time, and annual loss figures are not publicly confirmed, so numeric business cases must be labeled hypothetical pilot assumptions.
 
 ---
 
