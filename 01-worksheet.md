@@ -63,24 +63,50 @@ Hãy sử dụng **4 Lenses** dưới đây để quét qua hoạt động vận
 ### 📝 List bài toán của tôi:
 | # | Subsidiary (VinFast/Xanh SM...) | Lens | Mô tả ngắn bài toán |
 |---|----------------------------------|------|---------------------|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
+| 1 | **VinFast** | AI có thể tốt hơn | Tự động đề xuất lịch trình sạc tối ưu và trạm sạc trống phù hợp với loại cổng sạc (CCS2/GBT) của từng dòng xe điện (VF5, VF8, VF9). |
+| 2 |  **VinFast** |Lặp lại | So khớp dữ liệu sạc điện hằng tuần từ hàng nghìn trụ sạc liên kết ngoài với hóa đơn thực tế gửi về hệ thống tài chính. |
+| 3 | **Xanh SM** |Tốn thời gian | Tối ưu hóa điểm đón taxi điện Xanh SM dựa trên phân tích ngôn ngữ tự nhiên từ tin nhắn tài xế và tọa độ GPS thực tế. |
+| 4 | **Vinhomes** | Lặp lại | Phân loại tự động các khiếu nại (ví dụ: mất nước, hỏng đèn, ồn ào) gửi qua App Vinhomes Resident đến đúng ban quản lý từng tòa nhà. |
+| 5 | **VinFast** | AI có thể tốt hơn | Khách hàng mô tả tiếng Việt (ví dụ: *"xe đi qua gờ giảm tốc kêu cụp cụp ở bánh trước"*), hệ thống tự động phân loại mã lỗi kỹ thuật ban đầu. |
 
 ---
 
 # 🃏 Phase 2 — QUICK-ASSESS (Cá nhân, 30 min)
 
-Chọn **top 3 bài toán** từ danh sách trên và hoàn thiện **3 Quick Problem Cards** dưới đây (10 phút/card).
+Chọn **top 3 bài toán** từ danh sách trên(số 1, số 2 và số 4) và hoàn thiện **3 Quick Problem Cards** dưới đây (10 phút/card).
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ QUICK PROBLEM CARD #___                                     │
+│ QUICK PROBLEM CARD #_1_                                     │
 │                                                             │
 │ Bài toán (1 câu): ________________________________________  │
-│ Công ty thành viên: [ ] VinFast  [ ] Xanh SM  [ ] Vinhomes  │
+│ Công ty thành viên: [X] VinFast  [ ] Xanh SM  [ ] Vinhomes  │
+│                     [ ] Vinmec   [ ] Khác (Ghi rõ)________  │
+│                                                             │
+│ Ai đang đau (Actor)? _Người dùng xe, Điện lực______________ │
+│                                                             │
+│ Workflow thủ công hiện tại (3-5 bước):                      │
+│   1. Ước lượng quãng đường đi được dựa trên dung lượng pin 
+──> 2. Mở bản đồ để tìm và chọn trạm sạc 
+──> 3. Di chuyển xe đến trạm sạc  
+──> 4. Cắm sạc                    │
+│                                                             │
+│ Bước nào tốn thời gian/lỗi nhất? ___ (⏱ ___ phút/lượt)      │
+│ AI có thể nhảy vào hỗ trợ ở bước nào? _____________________ │
+│                                                             │
+│ Đo thành công bằng gì (Metric có số)? ______________________ │
+│ VD: "Giảm thời gian soạn phản hồi từ 10 min ──> under 2 min"│
+│                                                             │
+│ Quick Architecture: [ ] No AI  [ ] Rule  [ ] LLM  [ ] Agent │
+└─────────────────────────────────────────────────────────────┘
+```
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ QUICK PROBLEM CARD #_2_                                     │
+│                                                             │
+│ Bài toán (1 câu): ________________________________________  │
+│ Công ty thành viên: [X] VinFast  [ ] Xanh SM  [ ] Vinhomes  │
 │                     [ ] Vinmec   [ ] Khác (Ghi rõ)________  │
 │                                                             │
 │ Ai đang đau (Actor)? ______________________________________ │
@@ -97,6 +123,29 @@ Chọn **top 3 bài toán** từ danh sách trên và hoàn thiện **3 Quick Pr
 │ Quick Architecture: [ ] No AI  [ ] Rule  [ ] LLM  [ ] Agent │
 └─────────────────────────────────────────────────────────────┘
 ```
+```
+┌─────────────────────────────────────────────────────────────┐
+│ QUICK PROBLEM CARD #_4_                                     │
+│                                                             │
+│ Bài toán (1 câu): ________________________________________  │
+│ Công ty thành viên: [] VinFast  [ ] Xanh SM  [X ] Vinhomes  │
+│                     [ ] Vinmec   [ ] Khác (Ghi rõ)________  │
+│                                                             │
+│ Ai đang đau (Actor)? ______________________________________ │
+│                                                             │
+│ Workflow thủ công hiện tại (3-5 bước):                      │
+│   1. ___ ──> 2. ___ ──> 3. ___ ──> 4. ___                   │
+│                                                             │
+│ Bước nào tốn thời gian/lỗi nhất? ___ (⏱ ___ phút/lượt)      │
+│ AI có thể nhảy vào hỗ trợ ở bước nào? _____________________ │
+│                                                             │
+│ Đo thành công bằng gì (Metric có số)? ______________________ │
+│   VD: "Giảm thời gian soạn phản hồi từ 10 min ──> under 2 min"│
+│                                                             │
+│ Quick Architecture: [ ] No AI  [ ] Rule  [ ] LLM  [ ] Agent │
+└─────────────────────────────────────────────────────────────┘
+```
+
 
 > [!TIP]
 > **🤖 AI Prompts — Stress-Test thẻ bài toán:**

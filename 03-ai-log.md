@@ -1,0 +1,2 @@
+* AI đã hỗ trợ trong việc gợi ý cài `python-dotenv` để chuẩn bị môi trường để load key đã có sẵn từ file key được lập trước đó.
+* AI đã gợi ý các idea khi phân tích về business impact  business impact, success metric và operation boundary của problem được chọn của nhóm. Chưa tìm được cách tính chính xác để kiểm chứng cho từng tiêu chí trong business impact nên phần đó chưa có thông tin.
