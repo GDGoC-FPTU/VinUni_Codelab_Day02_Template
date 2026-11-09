@@ -31,82 +31,82 @@ Chọn **top 3 bài toán** từ danh sách trên và hoàn thiện **3 Quick Pr
 
 ### QUICK PROBLEM CARD #1
 
-**Bài toán (1 câu):**
+**Bài toán (1 câu):** Hỗ trợ nhân viên xử lý nhanh các khiếu nại CSKH phức tạp như mất tài sản, sai cước hoặc sự cố chuyến đi.
 
-**Công ty thành viên:** [ ] VinFast  [ ] Xanh SM  [ ] Vinhomes
+**Công ty thành viên:** [ ] VinFast  [x] Xanh SM  [ ] Vinhomes
 [ ] Vinmec  [ ] Vinpearl  [ ] Khác: ____________________
 
-**Ai đang đau (Actor)?**
+**Ai đang đau (Actor)?** Nhân viên chăm sóc khách hàng và khách hàng có khiếu nại cần phối hợp nhiều bộ phận.
 
 **Workflow thủ công hiện tại (3–5 bước):**
 
-1. ____________________________________
-2. ____________________________________
-3. ____________________________________
-4. ____________________________________
-5. ____________________________________
+1. Tiếp nhận và phân loại nội dung khiếu nại.
+2. Tra cứu lịch sử chuyến, cước, tài xế và các lần tương tác trước.
+3. Liên hệ tài xế hoặc bộ phận liên quan để xác minh.
+4. Chuyển cấp vụ việc nếu cần và soạn phản hồi cho khách hàng.
+5. Theo dõi kết quả xử lý và đóng khiếu nại.
 
-**Bước nào tốn thời gian/lỗi nhất?** ____________________
-**Thời gian xử lý:** __________ phút/lượt
+**Bước nào tốn thời gian/lỗi nhất?** Tra cứu nhiều hệ thống, xác minh và chuyển đúng bộ phận.
+**Thời gian xử lý:** 15 phút/lượt
 
-**AI có thể nhảy vào hỗ trợ ở bước nào?**
+**AI có thể nhảy vào hỗ trợ ở bước nào?** Bước 1–4: tóm tắt hồ sơ, đề xuất tuyến xử lý và soạn phản hồi nháp. Nhân viên phải duyệt trước khi gửi; AI không tự quyết định bồi thường hoặc truy cập dữ liệu ngoài quyền hạn.
 
-**Đo thành công bằng gì (Metric có số)?**
+**Đo thành công bằng gì (Metric có số)?** Giảm thời gian xử lý trung bình từ 15 phút xuống dưới 8 phút/lượt; ít nhất 85% vụ việc được chuyển đúng bộ phận ngay lần đầu; tỷ lệ khiếu nại mở lại không vượt quá 5%.
 
-**Quick Architecture:** [ ] No AI  [ ] Rule  [ ] LLM  [ ] Agent
+**Quick Architecture:** [ ] No AI  [ ] Rule  [x] LLM  [ ] Agent
 
 ---
 
 ### QUICK PROBLEM CARD #2
 
-**Bài toán (1 câu):**
+**Bài toán (1 câu):** Tối ưu lịch sạc toàn đội xe để giảm thời gian xe chờ và tăng thời gian sẵn sàng nhận chuyến.
 
-**Công ty thành viên:** [ ] VinFast  [ ] Xanh SM  [ ] Vinhomes
+**Công ty thành viên:** [ ] VinFast  [x] Xanh SM  [ ] Vinhomes
 [ ] Vinmec  [ ] Vinpearl  [ ] Khác: ____________________
 
-**Ai đang đau (Actor)?**
+**Ai đang đau (Actor)?** Điều phối viên đội xe và tài xế phải cân bằng nhu cầu chuyến, mức pin và tình trạng trạm sạc.
 
 **Workflow thủ công hiện tại (3–5 bước):**
 
-1. ____________________________________
-2. ____________________________________
-3. ____________________________________
-4. ____________________________________
-5. ____________________________________
+1. Theo dõi nhu cầu chuyến và số xe đang online theo khu vực.
+2. Kiểm tra mức pin, vị trí xe và thời gian ca làm.
+3. Xem tình trạng hàng đợi và công suất các trạm sạc.
+4. Đề xuất hoặc phân bổ thời điểm/trạm sạc cho các xe cần sạc.
+5. Điều chỉnh lịch khi nhu cầu chuyến hoặc tình trạng trạm thay đổi.
 
-**Bước nào tốn thời gian/lỗi nhất?** ____________________
-**Thời gian xử lý:** __________ phút/lượt
+**Bước nào tốn thời gian/lỗi nhất?** Tổng hợp dữ liệu nhiều nguồn và điều chỉnh khi nhu cầu hoặc hàng đợi thay đổi.
+**Thời gian xử lý:** 10 phút/lần cập nhật
 
-**AI có thể nhảy vào hỗ trợ ở bước nào?**
+**AI có thể nhảy vào hỗ trợ ở bước nào?** Bước 2–4: dự báo nhu cầu ngắn hạn, xếp hạng xe/trạm cần ưu tiên và đề xuất lịch sạc. Điều phối viên duyệt thay đổi; AI không tự điều khiển bộ sạc hoặc vi phạm giới hạn an toàn.
 
-**Đo thành công bằng gì (Metric có số)?**
+**Đo thành công bằng gì (Metric có số)?** Giảm thời gian chờ sạc trung bình ít nhất 20%; giảm thời gian xe không có chuyến do chờ sạc từ 10 xuống dưới 7 phút/xe/ngày; duy trì tỷ lệ xe sẵn sàng nhận chuyến trên 95%.
 
-**Quick Architecture:** [ ] No AI  [ ] Rule  [ ] LLM  [ ] Agent
+**Quick Architecture:** [ ] No AI  [x] Rule  [ ] LLM  [ ] Agent
 
 ---
 
 ### QUICK PROBLEM CARD #3
 
-**Bài toán (1 câu):**
+**Bài toán (1 câu):** Hậu kiểm ảnh bàn giao ca và checklist xe để phát hiện sớm hư hỏng hoặc ảnh không đạt chất lượng.
 
-**Công ty thành viên:** [ ] VinFast  [ ] Xanh SM  [ ] Vinhomes
+**Công ty thành viên:** [ ] VinFast  [x] Xanh SM  [ ] Vinhomes
 [ ] Vinmec  [ ] Vinpearl  [ ] Khác: ____________________
 
-**Ai đang đau (Actor)?**
+**Ai đang đau (Actor)?** Nhân viên giám sát đội xe và nhân viên kiểm tra phương tiện sau mỗi ca.
 
 **Workflow thủ công hiện tại (3–5 bước):**
 
-1. ____________________________________
-2. ____________________________________
-3. ____________________________________
-4. ____________________________________
-5. ____________________________________
+1. Tài xế hoàn thành checklist và chụp ảnh bàn giao xe.
+2. Nhân viên kiểm tra ảnh và đối chiếu với thông tin ca trước.
+3. Đánh dấu ảnh mờ, thiếu góc chụp hoặc có dấu hiệu hư hỏng.
+4. Liên hệ tài xế/giám sát để xác minh trường hợp nghi vấn.
+5. Cập nhật kết quả và chuyển xe đi kiểm tra nếu cần.
 
-**Bước nào tốn thời gian/lỗi nhất?** ____________________
-**Thời gian xử lý:** __________ phút/lượt
+**Bước nào tốn thời gian/lỗi nhất?** Xem và so sánh nhiều ảnh, dễ bỏ sót vết xước hoặc ảnh không đủ chất lượng.
+**Thời gian xử lý:** 2 phút/xe/lượt
 
-**AI có thể nhảy vào hỗ trợ ở bước nào?**
+**AI có thể nhảy vào hỗ trợ ở bước nào?** Bước 2–3: kiểm tra chất lượng ảnh, so sánh ảnh giữa hai ca và đánh dấu vùng nghi vấn. Giám sát viên phải xác minh trước khi kết luận xe có hư hỏng.
 
-**Đo thành công bằng gì (Metric có số)?**
+**Đo thành công bằng gì (Metric có số)?** Giảm thời gian hậu kiểm từ 2 phút xuống dưới 1 phút/xe; đạt ít nhất 95% ảnh đạt yêu cầu được nhận diện đúng; tỷ lệ bỏ sót hư hỏng nghiêm trọng dưới 2%.
 
-**Quick Architecture:** [ ] No AI  [ ] Rule  [ ] LLM  [ ] Agent
+**Quick Architecture:** [ ] No AI  [x] Rule  [ ] LLM  [ ] Agent
