@@ -19,7 +19,7 @@ from google import genai
 from google.genai import types
 
 # Standard Model Identifier
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-3.5-flash-lite"
 
 # ===========================================================================
 # 🛡️ Operational Boundaries to Enforce via System Prompt:
@@ -110,7 +110,7 @@ if __name__ == "__main__":
 
     print("\033[94m==================================================")
     print("🚀 Vin Smart Future — Programmatic Boundary Stress-Testing")
-    print("Standard Model: Google Gemini 2.5 Flash")
+    print("                    Standard Model: Google Gemini 3.5 Flash-Lite")
     print("==================================================\033[0m\n")
 
     failed_checks = False
