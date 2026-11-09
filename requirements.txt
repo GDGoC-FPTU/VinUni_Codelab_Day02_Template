@@ -1,5 +1,4 @@
 # Environment Dependencies
 # List all required python packages here.
-google-genai
-google-generativeai
+groq>=1.7.0,<2
 pytest

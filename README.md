@@ -39,40 +39,85 @@ Bạn phải kích hoạt môi trường ảo mỗi khi mở terminal mới trư
 *   **Dấu hiệu kích hoạt thành công:** Ở đầu dòng lệnh của terminal xuất hiện ký hiệu `(.venv)`.
 
 ### 📥 Bước 3: Cài đặt thư viện cần thiết
-Chạy lệnh sau để cài đặt SDK của Gemini và các thư viện hỗ trợ:
+Phiên bản `starter-code/prompt_prototype.py` hiện dùng **Groq API**. Cài thư viện một lần trong `.venv` của dự án:
 ```bash
-pip install google-genai google-generativeai pytest
+python -m pip install -r requirements.txt
 ```
+
+Không cần tạo lại `.venv` hoặc cài lại thư viện mỗi lần chạy. Các thư viện Gemini đã cài trước đó không cần thiết cho bản Groq; lệnh trên không tự gỡ chúng.
 
 ---
 
-## 🔑 2. Thiết lập biến môi trường `GEMINI_API_KEY`
+## 🔑 2. Thiết lập và sử dụng Groq API
 
-Để code Python gọi được Gemini API, bạn cần khai báo khóa API của mình vào biến môi trường. **Lưu ý: Không được dán trực tiếp API Key vào code để tránh bị lộ khóa khi push lên GitHub.**
+### Tạo API key (lần đầu)
 
-Hãy mở terminal đã kích hoạt `(.venv)` và chạy lệnh nạp khóa tương ứng:
+1. Đăng nhập [Groq Console](https://console.groq.com/).
+2. Mở [API Keys](https://console.groq.com/keys), chọn **Create API Key** và sao chép key.
+3. Đặt key trong terminal như bên dưới. **Không ghi key vào file Python, README hoặc commit lên Git.**
 
-### 🪟 Trên Windows:
-*   **Nếu dùng PowerShell (Mặc định của VS Code / Cursor):**
-    ```powershell
-    $env:GEMINI_API_KEY="AIzaSyYourGeminiApiKeyHere"
-    ```
-*   **Nếu dùng Command Prompt (CMD):**
-    ```cmd
-    set GEMINI_API_KEY=AIzaSyYourGeminiApiKeyHere
-    ```
+Groq có Free Plan với giới hạn lượt gọi/token theo model và tài khoản. Kiểm tra [Limits](https://console.groq.com/settings/limits) của tài khoản; không cần chuyển sang Developer Plan để thử trong hạn mức miễn phí. Xem [tài liệu hạn mức](https://console.groq.com/docs/rate-limits).
 
-### 🍎 Trên macOS / Linux:
-*   **Dùng Terminal:**
-    ```bash
-    export GEMINI_API_KEY="AIzaSyYourGeminiApiKeyHere"
-    ```
+### Chạy trên Windows PowerShell
 
-### 🧪 Kiểm tra xem API Key đã nhận diện chưa:
-Chạy lệnh python nhanh này trong terminal để kiểm tra:
-```bash
-python -c "import os; print('API Key status: OK' if os.getenv('GEMINI_API_KEY') else 'API Key status: MISSING')"
+Mở terminal tại thư mục gốc của dự án, thay `KEY_GROQ_CUA_BAN` bằng key vừa tạo:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+$env:GROQ_API_KEY="KEY_GROQ_CUA_BAN"
+python starter-code/prompt_prototype.py
 ```
+
+Nếu terminal đã có `(.venv)` thì bỏ qua dòng kích hoạt. Biến `$env:GROQ_API_KEY` chỉ áp dụng cho terminal hiện tại và các tiến trình con; khi mở terminal mới, kích hoạt lại môi trường và đặt lại key. Các biến `GEMINI_API_KEY`/`GOOGLE_API_KEY` cũ không được bản Groq sử dụng.
+
+Trên CMD:
+
+```cmd
+.venv\Scripts\activate.bat
+set GROQ_API_KEY=KEY_GROQ_CUA_BAN
+python starter-code/prompt_prototype.py
+```
+
+Trên macOS/Linux:
+
+```bash
+source .venv/bin/activate
+export GROQ_API_KEY="KEY_GROQ_CUA_BAN"
+python starter-code/prompt_prototype.py
+```
+
+Kiểm tra biến môi trường đã có giá trị mà không in key:
+
+```bash
+python -c "import os; print('API Key status: OK' if os.getenv('GROQ_API_KEY') else 'API Key status: MISSING')"
+```
+
+`OK` chỉ xác nhận có giá trị, chưa xác nhận key hợp lệ hoặc có quyền gọi API.
+
+### Model, prompt và kết quả
+
+- Model mặc định là `openai/gpt-oss-20b`, được gọi **qua Groq** bằng key Groq; không cần key OpenAI. Tham khảo [model được hỗ trợ](https://console.groq.com/docs/models).
+- Nếu cần đổi model được tài khoản cấp quyền, đặt `$env:GROQ_MODEL="TEN_MODEL_TREN_GROQ"` trước khi chạy. Không dùng tên model Gemini.
+- Sửa vai trò/quy tắc ở `SYSTEM_PROMPT`; sửa tình huống cụ thể tại từng trường `input` trong `ADVERSARIAL_TESTS` của `starter-code/prompt_prototype.py`.
+- Chương trình gọi API cho từng ca thử, nhận văn bản nguyên gốc, kiểm tra thẻ `[DRAFT_ONLY]`, cấu trúc JSON và nhãn mong đợi, rồi in `PASS` hoặc `FAIL`. Không tự thêm thẻ hoặc sửa câu trả lời để làm ca thử đạt.
+- `FAIL` là câu trả lời chưa đạt yêu cầu kiểm thử; khác với lỗi gọi API. Khi đó xem kết quả thực tế và điều chỉnh prompt nếu cần.
+
+### Xử lý lỗi
+
+| Thông báo | Cách kiểm tra |
+| :--- | :--- |
+| Thiếu `GROQ_API_KEY` | Đặt key trong chính terminal đang chạy chương trình. |
+| Thiếu SDK `groq` | Chạy `python -m pip install -r requirements.txt` trong `.venv`. |
+| Key chứa Unicode/khoảng trắng hoặc vẫn là giá trị mẫu | Sao chép **giá trị key**, không phải tên mô tả key, từ Groq Console. Thay toàn bộ `KEY_GROQ_CUA_BAN` bằng key thật, không thêm dấu cách/xuống dòng. |
+| `UnicodeEncodeError` | Chương trình hiển thị encoding và vị trí lỗi, không in nội dung gây lỗi để tránh lộ key. Kiểm tra lại key và các header tùy chỉnh; không cần xóa dấu tiếng Việt khỏi prompt. |
+| HTTP 401 | Kiểm tra key Groq có đúng, còn hiệu lực và không dán kèm khoảng trắng. |
+| HTTP 403 | Đọc thông báo chi tiết và kiểm tra quyền truy cập của tài khoản/project/model trong Groq Console. |
+| HTTP 404 | Kiểm tra `GROQ_MODEL` và danh sách model đang được hỗ trợ. |
+| HTTP 429 | Xem hạn mức và thời gian chờ; chạy lại sau khi hạn mức được phục hồi. |
+
+Tham khảo [Quickstart](https://console.groq.com/docs/quickstart) và [mã lỗi Groq](https://console.groq.com/docs/errors). Chương trình in mã HTTP và thông báo lỗi, đồng thời che key đang cấu hình.
+
+**Lưu ý khi nộp bài:** `autograder/autograder.py` hiện vẫn kiểm tra SDK Gemini và quy tắc của bài mẫu điều phối xe. Bộ chấm đó chưa tương thích với bản Vinhomes dùng Groq này; cần giảng viên xác nhận tiêu chí phù hợp. Bản chuyển đổi không sửa bộ chấm.
 
 ---
 
