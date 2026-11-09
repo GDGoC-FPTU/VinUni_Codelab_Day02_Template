@@ -76,26 +76,24 @@ thoáng nhất đến trụ)
 │                     [ ] Vinmec   [ ] Khác (Ghi rõ)________   │
 │                                                              │
 │ Ai đang đau (Actor)? Nhân viên đối soát / kế toán (chính);   │
-│   đối tác vận hành trụ; vận hành sạc.                        │
+│   đối tác vận hành trụ sạc.                                  │
 │                                                              │
 │ Workflow thủ công hiện tại (5 bước):                         │
-│   1. Xuất log phiên sạc từ hệ thống (CSV)                    │
-│   ──> 2. Thu hóa đơn đối tác (PDF/Excel, mỗi bên một mẫu)    │
+│   1. Xuất log phiên sạc từ hệ thống                          │
+│   ──> 2. Thu hóa đơn đối tác (PDF/ Giấy, mỗi bên một mẫu)    │
 │   ──> 3. Chuẩn hóa tay, dò khớp bằng Excel theo mã trụ /     │
 │          ngày / kWh / số tiền                                │
 │   ──> 4. Tra từng dòng lệch, email đối tác xác nhận          │
 │   ──> 5. Chốt số, chuyển tài chính thanh toán                │
 │                                                              │
 │ Bước nào tốn thời gian/lỗi nhất? Bước 3–4                    │
-│   (⏱ giả định ~5–10 phút/dòng lệch – cần đo baseline)        │
+│   (⏱ giả định ~5–10 phút/dòng lệch – cần đo baseline)       │
 │ AI có thể nhảy vào hỗ trợ ở bước nào?                        │
 │   • B2: đọc hóa đơn nhiều mẫu → bảng chuẩn                   │
 │   • B4: gom nhóm nguyên nhân lệch, soạn email cho đối tác    │
 │                                                              │
 │ Đo thành công bằng gì (Metric có số)?                        │
 │   • Tỷ lệ dòng khớp tự động (%) – mục tiêu đề xuất ≥ 95%     │
-│   • Giờ công đối soát / tuần (trước vs sau)                  │
-│   • Thời gian chốt sổ: số ngày từ cuối tuần → thanh toán     │
 │   • Số sai lệch (VND) phát hiện / lọt qua sau khi chốt       │
 │                                                              │
 │ Quick Architecture: [ ] No AI  [X] Rule  [X] LLM  [ ] Agent  │
@@ -115,9 +113,9 @@ thoáng nhất đến trụ)
 │   nhân viên  phân luồng ; ban quản lý tòa nhà.               │
 │                                                              │
 │ Workflow thủ công hiện tại (5 bước):                         │
-│   1. Cư dân gửi khiếu nại dạng tự do (chữ + ảnh)             │
+│   1. Cư dân gửi khiếu nại  (dạng chữ + ảnh)                  │
 │   ──> 2. Nhân viên đọc, xác định tòa + loại vấn đề           │
-│   ──> 3. Chuyển cho ban quản lý / kỹ thuật / an ninh         │
+│   ──> 3. Chuyển cho phòng\ban được nhắc tới trong khiếu nại  │
 │   ──> 4. Chuyển sai → bị trả lại → phân loại lại             │
 │   ──> 5. Xử lý, phản hồi cư dân                              │
 │                                                              │
@@ -130,9 +128,9 @@ thoáng nhất đến trụ)
 │                                                              │
 │ Đo thành công bằng gì (Metric có số)?                        │
 │   • Độ chính xác phân loại (%) – mục tiêu đề xuất ≥ 90%      │
-│   • Tỷ lệ bị chuyển lại (re-route rate, %)                   │
+│   • Tỷ lệ bị chuyển lại (%)                                  │
 │   • Thời gian từ lúc gửi → đúng bộ phận nhận (phút)          │
-│   • % khiếu nại khẩn được xử lý đúng SLA                     │
+│   • % khiếu nại khẩn được xử lý đúng                         │
 │                                                              │
 │ Quick Architecture: [ ] No AI  [X] Rule  [X] LLM  [ ] Agent  │
 └──────────────────────────────────────────────────────────────┘
