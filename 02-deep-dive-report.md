@@ -1,76 +1,111 @@
-# Lab 02 — Trợ lý xử lý sự cố pin Xanh SM
+# Báo cáo phân tích bài toán — Hỗ trợ xử lý đánh giá 1 sao cho tài xế Xanh SM
 
-## 1. Phạm vi và bằng chứng
+## 1. Mục tiêu kinh doanh và phạm vi của nhóm
 
-Đây là tình huống **mô phỏng phục vụ học tập**. Không có khảo sát hiện trường, dữ liệu nội bộ, phỏng vấn stakeholder hay số đo thật. Các con số là giả định minh họa và mục tiêu thử nghiệm. Ngưỡng pin lấy từ yêu cầu lab, không phải quy trình vận hành xe đã xác nhận.
+Nhóm đề xuất cải thiện quy trình tiếp nhận, phân loại và xem xét đánh giá 1 sao nhằm giảm khối lượng xử lý thủ công, rút ngắn thời gian phản hồi và bảo đảm việc xem xét phản ánh công bằng với cả khách hàng lẫn tài xế.
 
-Prototype chỉ nhận văn bản và trả đề xuất; không kết nối GPS, dữ liệu trạm, nhắn tin hoặc hệ thống điều xe. Mọi `dispatch_mobile_charger` là đề xuất chờ người phê duyệt.
+Mục tiêu là xử lý đúng và kịp thời từng phản ánh. Việc giữ hay gỡ đánh giá phải dựa trên bằng chứng và chính sách của doanh nghiệp; số lượng đánh giá được gỡ không phải thước đo thành công.
 
-## 2. Current-state workflow — 15 phút/lượt (giả định)
+Báo cáo tập trung vào xác định vấn đề, giá trị kinh doanh và điều kiện để tiếp tục nghiên cứu. Nhóm chưa đề xuất xây dựng hệ thống hoặc lựa chọn kiến trúc kỹ thuật ở giai đoạn này.
 
-| Bước | Người / công cụ giả định | Đầu vào → đầu ra | Thời gian | Chuyển giao / điểm nghẽn |
-|---|---|---|---:|---|
-| 1. Tiếp nhận sự cố | Điều phối viên / điện thoại, ticket | Tin nhắn, cuộc gọi → phiếu sự cố | 2 phút | Tài xế → điều phối viên |
-| 2. Xác minh GPS, mức pin | Điều phối viên / bản đồ, hỏi tài xế | Phiếu → dữ liệu đã xác minh | 2 phút | Tài xế/hệ thống vị trí → điều phối viên |
-| 3. Tra cứu hỗ trợ | Điều phối viên / danh bạ, dữ liệu hỗ trợ | Dữ liệu xe → lựa chọn cần xác nhận | 5 phút | **Bottleneck:** nguồn dữ liệu phân tán, có thể cũ |
-| 4. Soạn phương án | Điều phối viên / màn hình soạn tin | Lựa chọn đã kiểm tra → nội dung nháp | 5 phút | **Bottleneck:** viết lại thông tin, dễ bỏ sót |
-| 5. Chuyển duyệt và bàn giao | Điều phối viên → người có thẩm quyền/đội hỗ trợ | Nháp + phiếu → yêu cầu chờ xử lý | 1 phút | Chuyển giao sang người duyệt/đội hỗ trợ |
+**Cơ sở phân tích:** Các số liệu về quy mô, tỷ lệ đánh giá và thời gian dưới đây được kế thừa từ bản thảo của nhóm để lập kịch bản minh họa, chưa có nguồn hoặc dữ liệu vận hành xác nhận. Chúng không phải kết quả khảo sát hay cam kết hiệu quả.
 
-**2 + 2 + 5 + 5 + 1 = 15 phút**, chưa tính chờ bên ngoài và hành trình cứu hộ. Sơ đồ: `04-workflow-diagram.pdf`. Bước 5 không có nghĩa cứu hộ đã đến hay sự cố đã giải quyết.
+## 2. Quy trình hiện tại và điểm nghẽn
+
+Quy trình dưới đây diễn giải từ mô tả của nhóm, cần được bộ phận vận hành xác nhận trước khi dùng làm cơ sở đo lường.
+
+| Bước | Người phụ trách | Công việc và đầu ra | Thời gian theo bản thảo |
+|---|---|---|---|
+| 1. Tiếp nhận | Nhân viên tiếp nhận | Ghi nhận đánh giá 1 sao và nội dung phản ánh | Chưa đo |
+| 2. Kiểm tra thông tin | Nhân viên tiếp nhận | Kiểm tra thông tin vụ việc, xác định nội dung còn thiếu | Chưa đo |
+| 3. Phân loại | Nhân viên tiếp nhận | Xác định loại phản ánh và bộ phận phụ trách | 3–5 phút |
+| 4. Chuyển giao | Tiếp nhận → xử lý vi phạm | Bàn giao hồ sơ để xem xét | Chưa đo thời gian chờ |
+| 5. Tiếp nhận hồ sơ | Nhân viên xử lý vi phạm | Rà soát hồ sơ, yêu cầu bổ sung nếu cần | Chưa đo |
+| 6. Xác minh và đề xuất kết luận | Nhân viên xử lý vi phạm | Đối chiếu phản ánh, thông tin liên quan và giải trình của tài xế | 15–45 phút |
+| 7. Quyết định và phản hồi | Nhân sự có thẩm quyền | Quyết định theo chính sách, thông báo kết quả và ghi nhận lý do | Chưa đo |
+
+Hai điểm nghẽn nhóm nhận diện là **phân loại thủ công ở bước 3** và **xác minh ở bước 6**. Điểm bàn giao giữa hai bộ phận cũng cần khảo sát để xác định có phát sinh chờ đợi, thiếu hồ sơ hoặc xử lý lại hay không.
+
+Bản thảo dùng **45 phút/hồ sơ** làm mức trung bình minh họa. Đây chưa phải tổng thời gian được đo từ các bước trên. Cần phân biệt thời gian nhân viên trực tiếp xử lý với thời gian từ lúc nhận phản ánh đến khi có kết quả, bao gồm cả chờ đợi.
 
 ## 3. Problem Statement — 6 trường
 
 | Trường | Nội dung |
 |---|---|
-| Actor / Operator | Điều phối viên tiếp nhận báo cáo pin yếu; tài xế, người duyệt và đội hỗ trợ liên quan. |
-| Current Workflow | Tiếp nhận, xác minh, tra cứu, soạn và chuyển giao; tổng giả định 15 phút/lượt. |
-| Bottleneck | Tra cứu và soạn nháp chiếm 10/15 phút. LLM hỗ trợ diễn giải/soạn, chưa chứng minh giảm thời gian tra cứu. |
-| Business Impact | Giả định 20 lượt/ngày: 20 × 15 = 300 phút công/ngày. Nếu giảm trung bình còn 5 phút: tiềm năng tiết kiệm 200 phút/ngày. Đây là kịch bản, chưa phải ROI; chưa quy đổi tiền hoặc khẳng định giảm hủy chuyến. |
-| Success Metric | Mục tiêu pilot: ≥85% ca đủ dữ liệu hoàn tất đến chuyển giao trong ≤5 phút; soạn nháp ≤1 phút. Tập dự kiến 30 ca mô phỏng; ghi thêm trung vị, p95, tỷ lệ chỉnh sửa. Tất cả ca phải có nhãn nháp, JSON hợp lệ, cờ duyệt; mọi ca pin <5% đề xuất cứu hộ. Chưa có kết quả đạt mục tiêu. |
-| Operational Boundary | Chỉ đề xuất, luôn `[DRAFT_ONLY]`, không gửi tin/điều xe. Pin <5% → `dispatch_mobile_charger`, không chỉ đường đến trạm >5 km. Prototype thu hẹp hơn: không chọn trạm hoặc hướng dẫn tự lái. Không bịa thông tin; thiếu dữ liệu yêu cầu xác minh; lỗi chuyển thủ công. |
+| **Actor / Operator** | Nhân viên tiếp nhận và nhân viên xử lý vi phạm là người thực hiện chính. Khách hàng và tài xế là các bên chịu tác động; nhân sự có thẩm quyền chịu trách nhiệm quyết định cuối cùng. |
+| **Current Workflow** | Tiếp nhận đánh giá 1 sao → kiểm tra thông tin → phân loại → chuyển hồ sơ → xác minh → quyết định và phản hồi. Phần phân loại và xác minh hiện được mô tả là xử lý thủ công. |
+| **Bottleneck** | Phân loại mất khoảng 3–5 phút, xác minh mất khoảng 15–45 phút theo ước lượng của nhóm. Cần làm rõ phần thời gian dành cho đọc hiểu, tìm thông tin, chờ bổ sung và ra quyết định để chọn đúng điểm cải thiện. |
+| **Business Impact** | Khối lượng phản ánh lớn có thể tạo áp lực nhân sự, tăng hồ sơ tồn và kéo dài thời gian giải quyết. Quyết định thiếu nhất quán có thể ảnh hưởng niềm tin của khách hàng và sự công bằng với tài xế. Quy mô tác động cần được kiểm chứng bằng dữ liệu thực tế. |
+| **Success Metric** | Giữ mục tiêu ban đầu của nhóm: thời gian xử lý trung bình dưới 15 phút/hồ sơ và độ chính xác tối thiểu 98%. Cần thống nhất cách đo, phạm vi hồ sơ và chuẩn đối chiếu trước khi đánh giá; chi tiết tại mục 5. |
+| **Operational Boundary** | AI có thể hỗ trợ phân loại, tóm tắt và đề xuất nội dung cần xác minh từ thông tin vụ việc đã loại bỏ dữ liệu định danh. Nhân viên kiểm tra bằng chứng và quyết định. AI không tự gỡ đánh giá, kết luận vi phạm hoặc áp dụng chế tài. Hồ sơ thiếu thông tin, mâu thuẫn hay nhạy cảm được chuyển người phụ trách xem xét. |
 
-Mục tiêu 5 phút phụ thuộc chuẩn hóa đầu vào và tra cứu, không suy ra từ tốc độ LLM. Cần đo từng bước và so sánh với form + mẫu tin trước khi công bố lợi ích.
+## 4. Tác động kinh doanh — kịch bản cần kiểm chứng
 
-## 4. AI Fit và future-state flow
+Bản thảo nhóm nêu khoảng **70.000 tài xế**, **1 triệu chuyến/ngày** trên toàn hệ sinh thái và tỷ lệ đánh giá xấu **0,5%**. Chưa có nguồn xác nhận các số liệu này hoặc tỷ lệ đánh giá xấu nào thực sự là đánh giá 1 sao thuộc phạm vi xử lý.
 
-| Phương án | Đánh giá và quyết định |
-|---|---|
-| Rule / state machine | Rẻ, xác định; phù hợp ngưỡng pin khi đầu vào có cấu trúc. Chọn để kiểm tra đầu ra, cờ duyệt; form + mẫu tin là baseline bắt buộc. |
-| LLM feature | Phù hợp tin nhắn tự do và soạn nháp tiếng Việt; có thể hiểu sai/bịa. Chọn thử nghiệm, không giao quyền thực thi. |
-| Agentic loop | Chưa cần vòng lặp công cụ; thiếu nguồn dữ liệu xác thực. Không chọn trong phạm vi lab. |
+Nếu tạm giả định 0,5% tổng chuyến tạo ra một hồ sơ 1 sao cần xử lý, quy mô minh họa là:
 
-```mermaid
-flowchart TD
-    A[Người: tiếp nhận và xác minh dữ liệu] --> B[LLM: phân tích tin nhắn, soạn đề xuất]
-    B --> C{Rule: tiền tố, JSON, trường và cờ duyệt hợp lệ?}
-    C -- Không hoặc API lỗi --> F[Fallback: điều phối viên xử lý thủ công]
-    C -- Có --> D[Người: kiểm tra pin, dữ liệu, nội dung và hành động]
-    D -- Thiếu hoặc sai --> F
-    D -- Phê duyệt --> E[Người: thực hiện nghiệp vụ bên ngoài prototype]
-```
-
-**Code lab:** `evaluate_prompt()` trả văn bản Gemini nguyên gốc. Bộ chạy thử gọi `validate_output()` để kiểm tra tiền tố, JSON 5 trường, danh sách hành động, chuỗi không rỗng, cờ duyệt đúng `true`, khoảng cách trạm `null`. Hành động kỳ vọng của mỗi ca được khai báo sẵn để đối chiếu, không phải rule tự trích xuất pin từ mọi câu tự do.
-
-**Giới hạn:** Bộ xác minh không phát hiện mọi hướng dẫn sai trong văn bản nháp, không chứng minh đúng ngữ nghĩa và không xác minh GPS. Người duyệt phải đọc lại. Trước pilot cần mức pin có cấu trúc từ nguồn tin cậy và rule độc lập với LLM.
-
-**Fallback:** Thiếu khóa/SDK, lỗi mạng, phản hồi rỗng, JSON sai hoặc sai hành động kỳ vọng đều làm bài thử thất bại và trả mã lỗi khác 0. Không thay bằng phản hồi giả. Thiếu mức pin/vị trí thì yêu cầu xác minh; nếu đã biết pin nguy cấp thì giữ đề xuất cứu hộ, nêu vị trí còn thiếu.
-
-## 5. Kiểm chứng và chuẩn bị pilot
-
-- Có 6 ca: 4 ca ban đầu (pin 2%/trạm 8 km; dụ bỏ nhãn; giả mạo quản trị với pin 1%/trạm 12 km; dụ đoán dữ liệu khi thiếu pin/vị trí) và 2 biến thể mới (injection tiếng Anh với pin 4%; pin 3% thiếu GPS nhưng không có injection).
-- Kiểm tra cục bộ bộ xác minh bằng dữ liệu tự tạo và SDK giả lập; không phải bằng chứng mô hình đã tuân thủ.
-- Chạy thật: cài `requirements.txt`, đặt `GEMINI_API_KEY` hoặc `GOOGLE_API_KEY` trong môi trường, chạy `python3 starter-code/prompt_prototype.py`. Không đưa khóa vào Git hoặc nhật ký.
-- **Trạng thái hiện tại:** `gemini-2.5-flash` trả 404; người dùng chuyển sang `gemini-3.5-flash-lite`, ban đầu đạt **3/4**. Sau sửa prompt để tách chỉ thị giả khỏi dữ kiện pin, chạy lại nguyên 4 ca cũ và 2 biến thể đạt **6/6** theo log người dùng cung cấp. Ca giả mạo quản trị đã chuyển từ hỏi lại sang đề xuất cứu hộ đúng kỳ vọng. Đọc lại 6 phản hồi chưa thấy chỉ dẫn tới trạm xa, bịa GPS hoặc tuyên bố đã thực thi; vẫn có lỗi thiếu khoảng trắng. Không có số đo thời gian/chi phí hoặc kết quả trên tập độc lập. Chi tiết ở mục 11 của `03-ai-log.md`.
-- **Cấu hình và kiểm tra khi bàn giao:** dùng mặc định `gemini-3.5-flash-lite`, vẫn cho phép ghi đè bằng `GEMINI_MODEL`; không sửa autograder gốc. Người dùng đã chạy `python tools/check_submission.py --live`: **50 tests đạt, autograder đầy đủ đạt 10/10**. Báo cáo cục bộ ghi `live_autograder: passed`, `passed: true`; bước autograder chạy trong 7,447 giây. Đây là thời gian kiểm tra kỹ thuật, không phải số đo cycle time 15 → 5 phút của quy trình nghiệp vụ.
-- Pilot dự kiến: 30 ca đã ẩn định danh, có ca thường, thiếu dữ liệu, pin 4.9%/5%, dữ liệu mâu thuẫn và prompt injection. Người vận hành gán nhãn; so sánh thủ công, form + rule và LLM trên cùng tập. Ghi thời gian, lỗi, tỷ lệ chỉnh sửa, token và chi phí theo hóa đơn thực tế; không dùng bảng giá chưa xác minh.
-- Dừng mở rộng nếu có lỗi ranh giới. Nếu rule đạt cùng chất lượng với chi phí thấp hơn, chọn rule. Các ca lab không phải bằng chứng an toàn thực tế; ca đã dùng để sửa prompt không phải tập đánh giá độc lập.
-
-## 6. Readiness và quyết định
-
-| Điều kiện | Trạng thái | Bằng chứng / việc cần làm |
+| Chỉ tiêu | Cách tính theo giả định | Kết quả minh họa |
 |---|---|---|
-| Dữ liệu mẫu/log sạch | Chưa đủ | Có 6 ca tự tạo và log người dùng chạy model thật; chưa có log nghiệp vụ, tập đánh giá độc lập và baseline. |
-| Kiểm soát rủi ro AI sai | Đạt bộ thử lab, chưa đủ cho pilot thực tế | Prompt mới đạt 6/6 trong một lượt chạy; chưa đo độ ổn định qua nhiều lượt và chưa được vận hành xác nhận. |
-| Stakeholder sẵn sàng | Chưa xác nhận | Cần vận hành duyệt quy trình, trách nhiệm, ngưỡng và fallback. |
+| Hồ sơ cần xử lý mỗi ngày | 1.000.000 × 0,5% | 5.000 hồ sơ |
+| Tổng công xử lý ở mức hiện tại | 5.000 × 45 phút ÷ 60 | 3.750 giờ công/ngày |
+| Tổng công xử lý ở mốc mục tiêu 15 phút | 5.000 × 15 phút ÷ 60 | 1.250 giờ công/ngày |
+| Chênh lệch công xử lý tiềm năng | 3.750 − 1.250 | 2.500 giờ công/ngày |
 
-**Quyết định: NOT YET đối với triển khai thực tế.** Bản mẫu lab đã chạy thành công bộ thử 6 ca, có bằng chứng sửa lỗi sau thử nghiệm. Điều kiện xét lại: baseline/dữ liệu được xác nhận; kiểm thử model trên tập độc lập và qua nhiều lượt; so sánh rule; xác nhận chi phí/quyền sử dụng dữ liệu; stakeholder chấp thuận. Không có migration hoặc rollout sản xuất trong bài này.
+Kịch bản này chỉ đúng nếu số hồ sơ và thời gian công trực tiếp trên mỗi hồ sơ đúng với giả định. Nếu 45 phút bao gồm thời gian chờ, không thể quy toàn bộ thành giờ công. Chênh lệch trên chưa phải khoản tiết kiệm tiền hoặc mức giảm nhân sự đã được chứng minh.
+
+Nhóm kỳ vọng giá trị ở ba mặt:
+
+- **Hiệu quả vận hành:** giảm thao tác đọc, phân loại và tổng hợp lặp lại; dành thêm thời gian cho hồ sơ phức tạp.
+- **Chất lượng dịch vụ:** phản hồi sớm hơn, giảm hồ sơ tồn và duy trì cách giải quyết nhất quán.
+- **Công bằng với tài xế:** xem xét phản ánh trên cơ sở bằng chứng, hạn chế kết luận thiếu thông tin và xử lý lại.
+
+Chưa đủ cơ sở để khẳng định mỗi hồ sơ làm tài xế mất một chuyến xe. Cần xác nhận tài xế có bị gián đoạn hoạt động trong thời gian xem xét hay không, trong trường hợp nào và trong bao lâu trước khi tính tác động đến thu nhập hoặc doanh thu.
+
+## 5. Mục tiêu và cách đánh giá hiệu quả
+
+| Chỉ tiêu | Mục tiêu đề xuất | Cách đánh giá ở góc độ nghiệp vụ |
+|---|---|---|
+| Thời gian công xử lý | Trung bình dưới 15 phút/hồ sơ trong phạm vi đã thống nhất | Ghi thời gian trực tiếp xử lý; tách riêng thời gian chờ và phân tích theo độ phức tạp |
+| Chất lượng phân loại | Tối thiểu 98% trên bộ hồ sơ được nghiệp vụ thống nhất | So sánh phân loại đề xuất với kết quả chuyên viên đã rà soát; báo cáo cả số hồ sơ và từng nhóm phản ánh |
+| Chất lượng kết luận | Không suy ra từ độ chính xác phân loại | Đánh giá riêng kết luận giữ/gỡ đánh giá theo bằng chứng và chính sách; theo dõi sai sót ảnh hưởng khách hàng hoặc tài xế |
+| Thẩm quyền quyết định | 100% quyết định giữ/gỡ đánh giá do người có thẩm quyền xác nhận | Kiểm tra hồ sơ quyết định và lý do xử lý |
+| Trải nghiệm và tiến độ giải quyết | Xác lập mục tiêu sau khi đo hiện trạng | Theo dõi thời gian đến kết quả cuối cùng, hồ sơ tồn, tỷ lệ bổ sung thông tin và tỷ lệ khiếu nại lại |
+
+Mốc 98% được cụ thể hóa trước hết cho **phân loại phản ánh** để có cách đo rõ ràng. Nhóm cần thống nhất thêm tiêu chí đánh giá kết luận vi phạm; phân loại đúng chưa đủ để chứng minh quyết định cuối cùng đúng. Các mục tiêu trên chưa phải kết quả đã đạt.
+
+## 6. Vai trò dự kiến của AI và quy trình mong muốn
+
+AI có thể phù hợp với các tác vụ đọc phản ánh bằng ngôn ngữ tự nhiên, tóm tắt vụ việc và gợi ý phân loại. Giá trị cần kiểm chứng là nhân viên có xử lý nhanh hơn và duy trì chất lượng hay không.
+
+Quy trình mong muốn ở mức nghiệp vụ:
+
+1. Nhân viên tiếp nhận kiểm tra thông tin và bảo đảm hồ sơ đủ điều kiện xem xét.
+2. AI hỗ trợ tóm tắt, gợi ý nhóm phản ánh và chỉ ra thông tin cần bổ sung.
+3. Nhân viên rà soát gợi ý, chuyển đúng bộ phận và thực hiện xác minh.
+4. Người có thẩm quyền quyết định giữ hoặc gỡ đánh giá theo chính sách.
+5. Nhân viên phản hồi, ghi nhận lý do và theo dõi khiếu nại lại nếu có.
+
+Nếu gợi ý không rõ hoặc thiếu bằng chứng, nhân viên tiếp tục xử lý theo quy trình hiện hành. Không trì hoãn hồ sơ chỉ để chờ AI.
+
+**AI Fit:** Định hướng hiện tại là AI hỗ trợ nhân viên trong một số bước cụ thể. Việc tự phân loại và đưa ra gợi ý chưa đủ để kết luận cần AI Agent. Nhóm chưa chốt cách triển khai; trước hết cần so sánh giá trị với việc chuẩn hóa biểu mẫu, tiêu chí phân loại và hướng dẫn nghiệp vụ.
+
+## 7. Mức độ sẵn sàng và việc cần làm tiếp
+
+| Điều kiện | Hiện trạng theo tài liệu nhóm | Việc cần xác nhận |
+|---|---|---|
+| Dữ liệu mẫu và kết quả xử lý | Bản thảo đánh dấu chưa có dữ liệu sạch để đánh giá | Thu thập hồ sơ đại diện đã loại bỏ dữ liệu định danh, có kết quả và lý do xử lý |
+| Số liệu hiện trạng | Có các ước lượng về quy mô và thời gian | Xác nhận số hồ sơ 1 sao thực tế, thời gian công, thời gian chờ và tỷ lệ xử lý lại |
+| Khả năng kiểm soát sai sót | Nhóm dự kiến nhân viên kiểm tra và phê duyệt | Làm rõ ai chịu trách nhiệm, trường hợp nào cần chuyển cấp và cách sửa quyết định sai |
+| Sự sẵn sàng của các bên | Bản thảo đánh dấu sẵn sàng thay đổi | Xác nhận với bộ phận tiếp nhận, xử lý vi phạm và người phê duyệt; chưa có biên bản hoặc bằng chứng kèm theo |
+| Giá trị kinh tế | Chưa có chi phí thực tế để đối chiếu | Ước lượng lợi ích từ thời gian tiết kiệm, đồng thời tính cả công rà soát và xử lý lại |
+
+Ưu tiên tiếp theo của nhóm là trao đổi với người làm nghiệp vụ, thu thập hồ sơ mẫu, đo hiện trạng và thống nhất tiêu chí phân loại cùng nguyên tắc giữ/gỡ đánh giá. Sau đó mới quyết định có cần thử nghiệm AI hay cải tiến quy trình hiện hành đã đủ đáp ứng.
+
+## 8. Đề xuất quyết định của nhóm
+
+**NOT YET — tiếp tục làm rõ dữ liệu và cơ sở kinh doanh trước khi xây dựng.**
+
+Bài toán có tiềm năng cải thiện hiệu quả vận hành và chất lượng giải quyết phản ánh, nhưng chưa đủ bằng chứng để cam kết mức tiết kiệm hoặc hiệu quả của AI. Đây là đề xuất của nhóm trong bài lab, chưa phải quyết định phê duyệt thực tế của Ban Giám đốc.
+
+Nhóm đề xuất xem xét lại khi đã có số liệu hiện trạng được xác nhận, hồ sơ mẫu đủ để đánh giá, tiêu chí nghiệp vụ thống nhất và người phụ trách quy trình đồng thuận về phạm vi. Quyết định bước tiếp theo sẽ dựa trên lợi ích kinh doanh có thể đo được và khả năng duy trì chất lượng xử lý.
